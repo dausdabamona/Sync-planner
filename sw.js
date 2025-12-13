@@ -1,61 +1,47 @@
 /**
- * Sync Planner v4.2 - Service Worker
+ * Sync Planner - Service Worker
  * Offline support & caching
  */
 
-const CACHE_NAME = 'sync-planner-v4.2';
+const CACHE_NAME = 'sync-planner-v4.8';
 const ASSETS = [
   './',
   './index.html',
-  './css/main.css',
-  './css/dzikir-fullscreen.css',
-  './js/config.js',
-  './js/utils.js',
-  './js/api.js',
-  './js/ui.js',
-  './js/dzikir.js',
-  './js/app.js',
-  './manifest.json'
+  './app.js',
+  './manifest.json',
+  './icon-72.png',
+  './icon-96.png',
+  './icon-128.png',
+  './icon-144.png',
+  './icon-152.png',
+  './icon-192.png',
+  './icon-384.png',
+  './icon-512.png'
 ];
 
 // Install
 self.addEventListener('install', event => {
-  console.log('[SW] Installing...');
-  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
+        // Cache assets one by one to handle failures gracefully
         return Promise.allSettled(
-          ASSETS.map(url => 
-            cache.add(url).catch(err => console.log('[SW] Cache skip:', url, err))
-          )
+          ASSETS.map(url => cache.add(url).catch(err => console.log('Cache skip:', url)))
         );
       })
-      .then(() => {
-        console.log('[SW] Installed');
-        return self.skipWaiting();
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
 // Activate
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating...');
-  
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => {
-            console.log('[SW] Deleting old cache:', key);
-            return caches.delete(key);
-          })
+        keys.filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       );
-    }).then(() => {
-      console.log('[SW] Activated');
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -66,10 +52,6 @@ self.addEventListener('fetch', event => {
   
   // Skip API requests (always fetch fresh)
   if (event.request.url.includes('script.google.com')) return;
-  
-  // Skip Google APIs
-  if (event.request.url.includes('googleapis.com')) return;
-  if (event.request.url.includes('gstatic.com')) return;
   
   // Skip chrome-extension and other non-http requests
   if (!event.request.url.startsWith('http')) return;
@@ -90,28 +72,13 @@ self.addEventListener('fetch', event => {
         // Fallback to cache
         return caches.match(event.request)
           .then(cachedResponse => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            
-            // If no cache for HTML, return index.html
+            if (cachedResponse) return cachedResponse;
+            // If no cache, return offline page or empty response
             if (event.request.destination === 'document') {
               return caches.match('./index.html');
             }
-            
-            // Return offline response
-            return new Response('Offline', { 
-              status: 503, 
-              statusText: 'Service Unavailable' 
-            });
+            return new Response('Offline', { status: 503, statusText: 'Offline' });
           });
       })
   );
-});
-
-// Handle messages from main thread
-self.addEventListener('message', event => {
-  if (event.data === 'skipWaiting') {
-    self.skipWaiting();
-  }
 });
