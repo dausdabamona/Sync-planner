@@ -6313,17 +6313,48 @@ function initDzikir() {
     dzikirState.progress = JSON.parse(savedData);
   }
   
-  // Auto detect time
-  const hour = new Date().getHours();
-  dzikirState.time = hour < 12 ? 'pagi' : 'sore';
+  // Auto detect time dan set UI
+  updateDzikirTimeBasedOnClock();
   
   renderDzikirPage();
+}
+
+// Update dzikir time based on current clock
+function updateDzikirTimeBasedOnClock() {
+  const hour = new Date().getHours();
+  const isPagi = hour < 12;
+  
+  dzikirState.time = isPagi ? 'pagi' : 'sore';
+  
+  // Update button visibility - hide yang tidak sesuai waktu
+  const btnPagi = document.getElementById('btnDzikirPagi');
+  const btnSore = document.getElementById('btnDzikirSore');
+  
+  if (btnPagi && btnSore) {
+    if (isPagi) {
+      // Sebelum jam 12: Tampilkan Pagi, Sembunyikan Sore
+      btnPagi.style.display = 'flex';
+      btnPagi.classList.add('active');
+      btnSore.style.display = 'none';
+      btnSore.classList.remove('active');
+    } else {
+      // Setelah jam 12: Tampilkan Sore, Sembunyikan Pagi
+      btnPagi.style.display = 'none';
+      btnPagi.classList.remove('active');
+      btnSore.style.display = 'flex';
+      btnSore.classList.add('active');
+    }
+  }
 }
 
 // Update dzikir progress di header (bisa dipanggil dari home)
 function updateDzikirHeader() {
   const today = todayString();
   const savedData = localStorage.getItem(`dzikir_${today}`);
+  
+  // Selalu gunakan waktu berdasarkan jam
+  const hour = new Date().getHours();
+  const time = hour < 12 ? 'pagi' : 'sore';
   
   if (!savedData) {
     const headerEl = document.getElementById('dzikirProgress');
@@ -6332,8 +6363,6 @@ function updateDzikirHeader() {
   }
   
   const progress = JSON.parse(savedData);
-  const hour = new Date().getHours();
-  const time = hour < 12 ? 'pagi' : 'sore';
   const timeProgress = progress[time] || {};
   
   let completedCount = 0;
@@ -6354,8 +6383,21 @@ function updateDzikirHeader() {
   if (headerEl) headerEl.textContent = `${progressPercent}%`;
 }
 
-// Set dzikir time
+// Set dzikir time - sekarang hanya bisa switch sesuai waktu
 function setDzikirTime(time) {
+  const hour = new Date().getHours();
+  const isPagi = hour < 12;
+  
+  // Cegah switch ke waktu yang tidak sesuai
+  if (time === 'pagi' && !isPagi) {
+    showToast('Dzikir pagi hanya tersedia sebelum jam 12 siang', 'warning');
+    return;
+  }
+  if (time === 'sore' && isPagi) {
+    showToast('Dzikir sore hanya tersedia setelah jam 12 siang', 'warning');
+    return;
+  }
+  
   dzikirState.time = time;
   document.getElementById('btnDzikirPagi').classList.toggle('active', time === 'pagi');
   document.getElementById('btnDzikirSore').classList.toggle('active', time === 'sore');
@@ -6364,6 +6406,9 @@ function setDzikirTime(time) {
 
 // Render dzikir page
 function renderDzikirPage() {
+  // Pastikan UI tombol waktu sesuai jam
+  updateDzikirTimeBasedOnClock();
+  
   const time = dzikirState.time;
   const timeLabel = time === 'pagi' ? '🌅 Dzikir Pagi' : '🌆 Dzikir Sore';
   
