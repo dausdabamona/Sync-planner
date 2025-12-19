@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Weekly Review - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function render() {
+      const main = document.getElementById('mainContent');
+      const tasks = loadTasks();
+      const pomo = loadPomodoro();
+      const goals = loadGoals();
+      
+      const tasksDone = tasks.filter(t => t.done).length;
+      const tasksTotal = tasks.length;
+      
+      main.innerHTML = `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">📊</div>
+          <h3 style="font-size:16px;margin-bottom:4px;">Weekly Review</h3>
+          <p style="font-size:12px;color:#666;margin:0;">Evaluasi mingguanmu</p>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="stats-grid mb-3">
+          <div class="stat-box">
+            <div class="value">${tasksDone}</div>
+            <div class="label">Tasks Done</div>
+          </div>
+          <div class="stat-box">
+            <div class="value">${pomo.total || 0}</div>
+            <div class="label">Pomodoro</div>
+          </div>
+          <div class="stat-box">
+            <div class="value">${goals.length}</div>
+            <div class="label">Goals</div>
+          </div>
+          <div class="stat-box">
+            <div class="value">${Math.round((pomo.total || 0) * 25 / 60)}h</div>
+            <div class="label">Fokus</div>
+          </div>
+        </div>
+        
+        <!-- Review Form -->
+        <div class="card">
+          <h4 style="font-size:14px;margin-bottom:16px;">📝 Refleksi Minggu Ini</h4>
+          
+          <div class="form-group">
+            <label class="form-label">🏆 3 Kemenangan Terbesar</label>
+            <textarea class="form-input form-textarea" id="wins" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">📈 3 Hal yang Bisa Ditingkatkan</label>
+            <textarea class="form-input form-textarea" id="improve" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">💡 Pelajaran Terpenting</label>
+            <textarea class="form-input form-textarea" id="lesson" rows="2" placeholder="Minggu ini aku belajar bahwa..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">🎯 Fokus Minggu Depan</label>
+            <textarea class="form-input form-textarea" id="nextFocus" rows="2" placeholder="Minggu depan aku akan fokus pada..."></textarea>
+          </div>
+          
+          <button class="btn-submit" onclick="saveReview()">Simpan Review</button>
+        </div>
+        
+        <!-- Best Week Template Link -->
+        <div class="card mt-3" style="background:#f5f5f5;border:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <h4 style="font-size:14px;margin:0;">📅 Best Week Template</h4>
+              <p style="font-size:12px;color:#666;margin:4px 0 0 0;">Lihat jadwal idealmu</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showBestWeek()">Lihat →</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function saveReview() {
+      const review = {
+        wins: document.getElementById('wins')?.value || '',
+        improve: document.getElementById('improve')?.value || '',
+        lesson: document.getElementById('lesson')?.value || '',
+        nextFocus: document.getElementById('nextFocus')?.value || '',
+        date: new Date().toISOString()
+      };
+      
+      const reviews = Storage.load('reviews', []);
+      reviews.unshift(review);
+      if (reviews.length > 52) reviews.pop(); // Keep 1 year
+      Storage.save('reviews', reviews);
+      
+      showToast('✓ Review tersimpan', 'success');
+    }
+    
+    function showBestWeek() {
+      const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+      const schedule = isWeekend ? BEST_WEEK_TEMPLATE.weekend : BEST_WEEK_TEMPLATE.weekdays;
+      
+      openModal(`
+        <div class="modal">
+          <div class="modal-header">
+            <h3 class="modal-title">📅 Best Week Template</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size:12px;color:#666;margin-bottom:16px;">${isWeekend ? 'Weekend Schedule' : 'Weekday Schedule'}</p>
+            <div style="max-height:400px;overflow-y:auto;">
+              ${schedule.map(item => `
+                <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #eee;">
+                  <span style="font-weight:600;color:#0d47a1;min-width:50px;">${item.time}</span>
+                  <span style="font-size:13px;color:#333;">${item.activity}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `);
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '📊 Weekly Review' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>

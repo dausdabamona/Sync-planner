@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sunnah Rasul - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function renderHabits() {
+      const main = document.getElementById('mainContent');
+      const habits = loadHabits();
+      const done = Object.values(habits).filter(Boolean).length;
+      
+      const byTime = { pagi: [], siang: [], sore: [], malam: [] };
+      SUNNAH_HABITS.forEach(h => byTime[h.time].push(h));
+      
+      main.innerHTML = `
+        <!-- Stats -->
+        <div class="card mb-3" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7);border:none;">
+          <div style="text-align:center;">
+            <div style="font-size:32px;font-weight:700;color:#7b1fa2;">${done}/11</div>
+            <div style="font-size:13px;color:#6a1b9a;">Sunnah hari ini</div>
+            <div style="margin-top:8px;height:8px;background:rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:${(done/11)*100}%;background:#7b1fa2;border-radius:4px;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quote -->
+        <div class="card mb-3" style="background:#fffde7;border:none;text-align:center;">
+          <p style="font-family:'Amiri',serif;font-size:18px;color:#f57f17;margin-bottom:4px;">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</p>
+          <p style="font-size:12px;color:#666;">"Sebaik-baik kalian adalah yang mempelajari Al-Quran dan mengajarkannya"</p>
+        </div>
+        
+        <!-- Habits by Time -->
+        ${Object.entries(byTime).map(([time, items]) => {
+          if (!items.length) return '';
+          const timeLabel = { pagi: '🌅 Pagi', siang: '☀️ Siang', sore: '🌇 Sore', malam: '🌙 Malam' };
+          return `
+            <div class="mb-3">
+              <h3 style="font-size:13px;color:#666;margin-bottom:8px;">${timeLabel[time]}</h3>
+              ${items.map(h => `
+                <div class="habit-item ${habits[h.id]?'done':''}" onclick="toggleHabit('${h.id}'); renderHabits();">
+                  <div class="habit-checkbox">${habits[h.id]?'✓':''}</div>
+                  <div class="habit-info">
+                    <div class="habit-name">${h.icon} ${h.name}</div>
+                    <div class="habit-arabic" style="font-family:'Amiri',serif;font-size:14px;color:#666;">${h.arabic}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }).join('')}
+        
+        <!-- Tips -->
+        <div class="card mt-4" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:none;">
+          <h4 style="font-size:13px;margin-bottom:8px;">💡 Tips Istiqomah</h4>
+          <ul style="font-size:12px;color:#666;padding-left:16px;margin:0;">
+            <li>Mulai dengan yang paling mudah</li>
+            <li>Konsisten lebih baik dari sempurna</li>
+            <li>Ajak keluarga bersama-sama</li>
+            <li>Niatkan karena Allah</li>
+          </ul>
+        </div>
+      `;
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '✨ Sunnah Rasul' });
+      renderBottomNav();
+      renderHabits();
+    });
+  </script>
+</body>
+</html>

@@ -2,355 +2,126 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0D47A1">
-  <meta name="description" content="Sync Planner - Produktivitas Islami">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Sync Planner</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Sync Planner - Islamic Productivity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/features.css">
 </head>
 <body>
-  <div class="app-container">
-    
-    <!-- ============================================ -->
-    <!-- HEADER -->
-    <!-- ============================================ -->
-    <header class="header">
-      <div class="header-top">
-        <h1>🌙 Sync Planner</h1>
-        <div class="header-actions">
-          <button class="header-btn" onclick="location.reload()">🔄</button>
-        </div>
-      </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          ✅ <span class="value" id="headerTasks">0</span>
-        </div>
-        <div class="stat-item">
-          🍅 <span class="value" id="headerPomodoro">0</span>
-        </div>
-        <div class="stat-item">
-          🔥 <span class="value" id="headerHabits">0</span>
-        </div>
-        <div class="stat-item clickable" onclick="openBreakSettingsModal()">
-          🧘 <span class="value" id="breakStreak">0🔥</span>
-        </div>
-      </div>
-    </header>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"><div class="loading"><div class="spinner"></div></div></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
 
-    <!-- ============================================ -->
-    <!-- MAIN CONTENT -->
-    <!-- ============================================ -->
-    <main class="main-content">
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // ===== HOME PAGE RENDER =====
+    function renderHome() {
+      const main = document.getElementById('mainContent');
+      const quote = getRandomQuote();
+      const journal = loadJournal();
+      const tasks = loadTasks().filter(t => !t.done).slice(0, 3);
+      const sholat = loadSholat();
+      const habits = loadHabits();
+      const schedule = isWeekend() ? BEST_WEEK_TEMPLATE.weekend : BEST_WEEK_TEMPLATE.weekdays;
       
-      <!-- HOME PAGE -->
-      <div class="page active" id="page-home">
-        <!-- Date -->
-        <div class="card" style="text-align:center;padding:12px;">
-          <div id="currentDate" style="font-size:14px;color:#666;"></div>
+      main.innerHTML = `
+        <!-- Quote Card -->
+        <div class="quote-card">
+          <div class="quote-icon">💡</div>
+          <div class="quote-content">
+            <div class="quote-text">${quote.text}</div>
+            <div class="quote-source">— ${quote.source}</div>
+          </div>
+          <button class="quote-refresh" onclick="refreshQuote()">🔄</button>
         </div>
         
-        <!-- Wisdom Card -->
-        <div class="card wisdom-card" id="wisdomCard"></div>
-        
-        <!-- Habits -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">🔥 Habit Harian</span>
-          </div>
-          <div class="habit-grid" id="habitsContainer"></div>
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <button class="action-btn primary" onclick="navigateTo('pomodoro')"><span class="icon">🎯</span><span class="label">Fokus</span></button>
+          <button class="action-btn" onclick="showAddTask()"><span class="icon">➕</span><span class="label">Task</span></button>
+          <button class="action-btn" onclick="navigateTo('journal')"><span class="icon">📝</span><span class="label">Jurnal</span></button>
+          <button class="action-btn" onclick="navigateTo('wisdom')"><span class="icon">🏛️</span><span class="label">Wisdom</span></button>
         </div>
         
-        <!-- Today's Tasks Preview -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">📋 Tugas Hari Ini</span>
-            <button class="btn btn-sm btn-primary" onclick="showPage('tasks')">Lihat Semua</button>
+        <!-- Two Column -->
+        <div class="home-two-column">
+          <div class="home-left-col">
+            <div class="journal-card morning compact-card">
+              <div class="header"><div class="title">☀️ Jurnal Pagi</div><span class="status ${journal.morning?'done':'pending'}">${journal.morning?'✓':'Belum'}</span></div>
+              ${!journal.morning ? '<button class="btn btn-sm btn-primary btn-full" onclick="navigateTo(\'journal\')">Isi Jurnal</button>' : '<div class="content">'+(journal.morning.focus||'Sudah diisi')+'</div>'}
+            </div>
+            <div class="journal-card evening compact-card">
+              <div class="header"><div class="title">🌙 Jurnal Malam</div><span class="status ${journal.evening?'done':'pending'}">${journal.evening?'✓':'Belum'}</span></div>
+              ${!journal.evening ? '<button class="btn btn-sm btn-primary btn-full" onclick="navigateTo(\'journal\')">Isi Jurnal</button>' : '<div class="content">'+(journal.evening.wins||'Sudah diisi')+'</div>'}
+            </div>
           </div>
-          <div id="todayTasks"></div>
-        </div>
-        
-        <!-- Quick Dzikir -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">📿 Dzikir Cepat</span>
-            <button class="btn btn-sm btn-secondary" onclick="resetDzikir()">Reset</button>
-          </div>
-          <div class="dzikir-container" style="padding:16px;">
-            <div class="dzikir-arabic" id="dzikirArabic" style="font-size:28px;">سُبْحَانَ اللّٰهِ</div>
-            <div class="dzikir-text" id="dzikirLatin" style="font-size:16px;margin-bottom:16px;">Subhanallah</div>
-            <div class="dzikir-tap-area" onclick="incrementDzikir()" style="width:140px;height:140px;">
-              <div>
-                <div class="dzikir-counter" id="dzikirCount" style="font-size:48px;margin:0;">0</div>
-                <div id="dzikirProgress" style="font-size:12px;color:rgba(255,255,255,0.8);">0/33</div>
+          <div class="home-right-col">
+            <div class="card compact-card wisdom-home-card" onclick="navigateTo('wisdom')">
+              <div class="wisdom-of-day">
+                <div class="wisdom-home-icon">🏛️</div>
+                <div class="wisdom-home-principle">الصبر مفتاح الفرج</div>
+                <div class="wisdom-home-title">Kesabaran adalah Kunci</div>
+                <div class="wisdom-home-frameworks"><span>🏛️</span><span>🧠</span><span>🦋</span><span>⚛️</span></div>
               </div>
             </div>
-            <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
-              <button class="btn btn-sm" onclick="setDzikir('subhanallah')">Subhanallah</button>
-              <button class="btn btn-sm" onclick="setDzikir('alhamdulillah')">Alhamdulillah</button>
-              <button class="btn btn-sm" onclick="setDzikir('allahuakbar')">Allahu Akbar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- TASKS PAGE -->
-      <div class="page" id="page-tasks">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h2 style="font-size:18px;font-weight:600;">📋 Tugas</h2>
-          <button class="btn btn-primary" onclick="openAddTaskModal()">+ Tambah</button>
-        </div>
-        <div id="tasksContainer"></div>
-      </div>
-      
-      <!-- POMODORO PAGE -->
-      <div class="page" id="page-pomodoro">
-        <div class="card">
-          <div class="pomodoro-container">
-            <!-- Timer Type Selector -->
-            <div class="timer-types" id="timerTypes"></div>
-            
-            <!-- Current Task -->
-            <div class="timer-task" id="timerTask" style="display:none;cursor:pointer;" onclick="openPomodoroTaskModal()"></div>
-            <button class="btn btn-sm btn-secondary mb-2" onclick="openPomodoroTaskModal()">📋 Pilih Tugas</button>
-            
-            <!-- Timer Display -->
-            <div class="progress-ring">
-              <svg width="200" height="200">
-                <circle class="progress-ring-bg" cx="100" cy="100" r="90"></circle>
-                <circle class="progress-ring-fill" id="timerProgress" cx="100" cy="100" r="90" 
-                        stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
-              </svg>
-              <div class="timer-display" id="timerDisplay">25:00</div>
-            </div>
-            
-            <!-- Controls -->
-            <div class="timer-controls">
-              <button class="btn btn-primary timer-btn" id="timerStartBtn" onclick="startTimer()">▶️ Mulai</button>
-              <button class="btn btn-warning timer-btn" id="timerPauseBtn" onclick="pauseTimer()" style="display:none;">⏸️ Pause</button>
-              <button class="btn btn-danger timer-btn" id="timerStopBtn" onclick="stopTimer()" style="display:none;">⏹️ Stop</button>
-            </div>
-            
-            <!-- Session Counter -->
-            <div style="margin-top:20px;font-size:14px;color:#666;">
-              Sesi hari ini: <strong id="sessionCount">0</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- REFLEKSI PAGE -->
-      <div class="page" id="page-refleksi">
-        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px;">📊 Refleksi & Stats</h2>
-        <div id="refleksiContent"></div>
-      </div>
-      
-      <!-- SETTINGS PAGE -->
-      <div class="page" id="page-settings">
-        <h2 style="font-size:18px;font-weight:600;margin-bottom:16px;">⚙️ Pengaturan</h2>
-        
-        <div class="settings-section">
-          <div class="settings-title">Notifikasi</div>
-          <div class="setting-row" onclick="toggleSetting('notifications')">
-            <div class="setting-info">
-              <span class="setting-icon">🔔</span>
-              <span class="setting-label">Notifikasi</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingNotifications" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-row" onclick="toggleSetting('sound')">
-            <div class="setting-info">
-              <span class="setting-icon">🔊</span>
-              <span class="setting-label">Suara</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingSound" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-row" onclick="toggleSetting('vibration')">
-            <div class="setting-info">
-              <span class="setting-icon">📳</span>
-              <span class="setting-label">Getaran</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="settingVibration" checked>
-              <span class="toggle-slider"></span>
-            </label>
           </div>
         </div>
         
-        <div class="settings-section">
-          <div class="settings-title">Istirahat Sehat</div>
-          <div class="setting-row" onclick="openBreakSettingsModal()">
-            <div class="setting-info">
-              <span class="setting-icon">🧘</span>
-              <span class="setting-label">Pengaturan Istirahat</span>
-            </div>
-            <span>→</span>
+        <!-- Sholat -->
+        <div class="card compact-card">
+          <div class="card-header"><span class="card-title">🕌 Sholat Hari Ini</span><span class="card-action" onclick="navigateTo('ibadah')">Lihat →</span></div>
+          <div class="sholat-mini-list">
+            ${SHOLAT_LIST.map(s => `<div class="sholat-row-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholat('${s.id}')"><div class="check">${sholat[s.id]?.done?'✓':''}</div><span>${s.icon} ${s.name}</span></div>`).join('')}
           </div>
         </div>
         
-        <div class="settings-section">
-          <div class="settings-title">Data</div>
-          <div class="setting-row" onclick="exportData()">
-            <div class="setting-info">
-              <span class="setting-icon">📤</span>
-              <span class="setting-label">Export Data</span>
-            </div>
-            <span>→</span>
-          </div>
-          <div class="setting-row" onclick="clearAllData()">
-            <div class="setting-info">
-              <span class="setting-icon">🗑️</span>
-              <span class="setting-label">Hapus Semua Data</span>
-            </div>
-            <span style="color:#ef4444;">→</span>
+        <!-- Sunnah -->
+        <div class="card compact-card">
+          <div class="card-header"><span class="card-title">✨ Sunnah Rasul</span><span class="card-action" onclick="navigateTo('habits')">Lihat →</span></div>
+          <div class="sunnah-mini-list">
+            ${SUNNAH_HABITS.map(h => `<div class="sunnah-mini-item ${habits[h.id]?'done':''}" onclick="toggleHabit('${h.id}')"><div class="check">${habits[h.id]?'✓':''}</div><span>${h.icon} ${h.name}</span></div>`).join('')}
           </div>
         </div>
         
-        <div class="card" style="text-align:center;margin-top:24px;">
-          <div style="font-size:32px;margin-bottom:8px;">🌙</div>
-          <div style="font-size:14px;font-weight:600;color:#333;">Sync Planner v2.0</div>
-          <div style="font-size:12px;color:#888;">Produktivitas Islami dengan Healthy Break</div>
+        <!-- Tasks -->
+        <div class="card compact-card">
+          <div class="card-header"><span class="card-title">📌 Fokus Hari Ini</span><span class="card-action" onclick="navigateTo('tasks')">Semua →</span></div>
+          ${tasks.length ? tasks.map(t => `
+            <div class="task-item priority-${t.priority||'medium'}" onclick="toggleTask('${t.id}')">
+              <div class="task-checkbox ${t.done?'checked':''}">${t.done?'✓':''}</div>
+              <div class="task-content"><div class="task-title">${t.title}</div></div>
+            </div>
+          `).join('') : '<div class="empty-state"><p>Belum ada task</p></div>'}
         </div>
-      </div>
-      
-    </main>
-
-    <!-- ============================================ -->
-    <!-- BOTTOM NAVIGATION -->
-    <!-- ============================================ -->
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-page="home" onclick="showPage('home')">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">Home</span>
-      </button>
-      <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">
-        <span class="nav-icon">📋</span>
-        <span class="nav-label">Tugas</span>
-      </button>
-      <button class="nav-item" data-page="pomodoro" onclick="showPage('pomodoro')">
-        <span class="nav-icon">🍅</span>
-        <span class="nav-label">Fokus</span>
-      </button>
-      <button class="nav-item" data-page="refleksi" onclick="showPage('refleksi')">
-        <span class="nav-icon">📊</span>
-        <span class="nav-label">Refleksi</span>
-      </button>
-      <button class="nav-item" data-page="settings" onclick="showPage('settings')">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-label">Setting</span>
-      </button>
-    </nav>
-
-    <!-- ============================================ -->
-    <!-- FLOATING ACTION BUTTON -->
-    <!-- ============================================ -->
-    <button class="fab" onclick="openAddTaskModal()">+</button>
-
-    <!-- ============================================ -->
-    <!-- TOAST NOTIFICATION -->
-    <!-- ============================================ -->
-    <div id="toast"></div>
-
-    <!-- ============================================ -->
-    <!-- MODALS -->
-    <!-- ============================================ -->
-    
-    <!-- Add Task Modal -->
-    <div class="modal-overlay" id="addTaskModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 class="modal-title">➕ Tambah Tugas</h3>
-          <button class="modal-close" onclick="closeAddTaskModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Judul Tugas</label>
-            <input type="text" class="form-input" id="newTaskTitle" placeholder="Masukkan judul tugas...">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Prioritas</label>
-            <select class="form-select" id="newTaskPriority">
-              <option value="high">🔴 Tinggi</option>
-              <option value="medium" selected>🟡 Sedang</option>
-              <option value="low">🟢 Rendah</option>
-            </select>
+        
+        <!-- Schedule -->
+        <div class="card compact-card">
+          <div class="card-header"><span class="card-title">📅 Jadwal Hari Ini</span></div>
+          <div class="today-schedule-container">
+            ${schedule.slice(0, 8).map(item => `<div class="today-schedule-item"><span class="schedule-time">${item.time}</span><span class="schedule-activity">${item.activity}</span></div>`).join('')}
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeAddTaskModal()">Batal</button>
-          <button class="btn btn-primary" onclick="submitNewTask()">Tambah</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Pomodoro Task Modal -->
-    <div class="modal-overlay" id="pomodoroTaskModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 class="modal-title">📋 Pilih Tugas Fokus</h3>
-          <button class="modal-close" onclick="closePomodoroTaskModal()">×</button>
-        </div>
-        <div class="modal-body" id="pomodoroTaskList"></div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closePomodoroTaskModal()">Batal</button>
-          <button class="btn btn-primary" onclick="confirmCustomPomodoroTask()">Pilih</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ============================================ -->
-  <!-- SCRIPTS -->
-  <!-- ============================================ -->
-  <script src="healthy-break.js"></script>
-  <script src="app.js"></script>
-  
-  <script>
-    // Additional utility functions
-    function exportData() {
-      const data = {
-        tasks: JSON.parse(localStorage.getItem('syncPlannerTasks') || '[]'),
-        habits: JSON.parse(localStorage.getItem('syncPlannerHabits') || '[]'),
-        journals: JSON.parse(localStorage.getItem('syncPlannerJournals') || '[]'),
-        settings: JSON.parse(localStorage.getItem('syncPlannerSettings') || '{}'),
-        exportedAt: new Date().toISOString()
-      };
-      
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sync-planner-backup-' + todayString() + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('📤 Data berhasil di-export!', 'success');
+      `;
     }
     
-    function clearAllData() {
-      if (!confirm('PERINGATAN: Semua data akan dihapus permanen!\n\nLanjutkan?')) return;
-      if (!confirm('Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.')) return;
-      
-      localStorage.clear();
-      showToast('🗑️ Semua data dihapus', 'info');
-      setTimeout(() => location.reload(), 1000);
+    function refreshQuote() {
+      const quote = getRandomQuote();
+      document.querySelector('.quote-text').textContent = quote.text;
+      document.querySelector('.quote-source').textContent = '— ' + quote.source;
     }
     
-    // Register Service Worker untuk PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('✅ Service Worker registered'))
-        .catch(err => console.log('SW registration failed:', err));
-    }
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader();
+      renderBottomNav('home');
+      renderHome();
+    });
   </script>
 </body>
 </html>

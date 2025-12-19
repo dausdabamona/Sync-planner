@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pomodoro - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    let timerSeconds = 0;
+    let timerActive = false;
+    let timerInterval = null;
+    let currentType = 'focus';
+    
+    function renderPomodoro() {
+      const main = document.getElementById('mainContent');
+      const pomo = loadPomodoro();
+      const type = TIMER_TYPES[currentType];
+      
+      if (!timerSeconds) timerSeconds = type.duration * 60;
+      
+      main.innerHTML = `
+        <div class="pomodoro-container">
+          <!-- Timer Types -->
+          <div class="pomodoro-types">
+            ${Object.entries(TIMER_TYPES).map(([key, t]) => `
+              <div class="pomodoro-type-btn ${key === currentType ? 'active' : ''}" onclick="selectType('${key}')">
+                <div class="pomodoro-type-icon">${t.icon}</div>
+                <div class="pomodoro-type-name">${t.name}</div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <!-- Timer Ring -->
+          <div class="pomodoro-timer-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="timer-bg" cx="50" cy="50" r="45"/>
+              <circle class="timer-progress" id="timerProgress" cx="50" cy="50" r="45" 
+                      stroke-dasharray="283" stroke-dashoffset="0" style="stroke:${type.color}"/>
+            </svg>
+            <div class="timer-display">
+              <div class="timer-time" id="timerDisplay">${formatTime(timerSeconds)}</div>
+              <div class="timer-label">${type.name}</div>
+            </div>
+          </div>
+          
+          <!-- Controls -->
+          <div class="pomodoro-controls">
+            <button class="pomodoro-ctrl-btn primary" id="startBtn" onclick="toggleTimer()">
+              ${timerActive ? '⏸️ Pause' : '▶️ Mulai'}
+            </button>
+            <button class="pomodoro-ctrl-btn secondary" onclick="resetTimer()">🔄 Reset</button>
+          </div>
+          
+          <!-- Stats -->
+          <div class="stats-grid mt-4">
+            <div class="stat-box">
+              <div class="value">${pomo.today || 0}</div>
+              <div class="label">Hari Ini</div>
+            </div>
+            <div class="stat-box">
+              <div class="value">${pomo.total || 0}</div>
+              <div class="label">Total</div>
+            </div>
+            <div class="stat-box">
+              <div class="value">${pomo.streak || 0}🔥</div>
+              <div class="label">Streak</div>
+            </div>
+            <div class="stat-box">
+              <div class="value">${Math.round((pomo.total || 0) * 25 / 60)}h</div>
+              <div class="label">Jam Fokus</div>
+            </div>
+          </div>
+          
+          <!-- Tips -->
+          <div class="card mt-4" style="background:#fff3e0;border:none;">
+            <h4 style="font-size:13px;margin-bottom:8px;">🍅 Tips Pomodoro</h4>
+            <ul style="font-size:12px;color:#666;padding-left:16px;margin:0;">
+              <li>Fokus penuh selama sesi</li>
+              <li>Istirahat sebentar tiap sesi</li>
+              <li>Setiap 4 sesi, istirahat panjang</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+    
+    function selectType(type) {
+      if (timerActive) {
+        if (!confirm('Timer sedang berjalan. Reset?')) return;
+        clearInterval(timerInterval);
+        timerActive = false;
+      }
+      currentType = type;
+      timerSeconds = TIMER_TYPES[type].duration * 60;
+      renderPomodoro();
+    }
+    
+    function toggleTimer() {
+      if (timerActive) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+    
+    function startTimer() {
+      timerActive = true;
+      document.getElementById('startBtn').textContent = '⏸️ Pause';
+      
+      timerInterval = setInterval(() => {
+        timerSeconds--;
+        updateDisplay();
+        
+        if (timerSeconds <= 0) {
+          completePomodoro();
+        }
+      }, 1000);
+    }
+    
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerActive = false;
+      document.getElementById('startBtn').textContent = '▶️ Lanjut';
+    }
+    
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerActive = false;
+      timerSeconds = TIMER_TYPES[currentType].duration * 60;
+      renderPomodoro();
+    }
+    
+    function updateDisplay() {
+      const display = document.getElementById('timerDisplay');
+      const progress = document.getElementById('timerProgress');
+      
+      if (display) display.textContent = formatTime(timerSeconds);
+      if (progress) {
+        const total = TIMER_TYPES[currentType].duration * 60;
+        const offset = 283 * (1 - timerSeconds / total);
+        progress.style.strokeDashoffset = offset;
+      }
+    }
+    
+    function completePomodoro() {
+      clearInterval(timerInterval);
+      timerActive = false;
+      
+      // Play sound
+      try {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJOyqoB0aXZ/krKyl4F6faGvuriuoJKJiJGls7W0r6Ofl5WYorC3t7WxqaGam6CqtLm4tbCoo6ChpKy0uLi1sq2opaaqsLW4t7WyrKmprK+1uLi2s66rqquusbW4trSxrqysr7K2uLe0sq+urq+ytbe3tbOwr6+wsrW3trSyr7CwsbO2t7W0srCwsbK0tre1tLKxsbGytLa2tbSysrKys7W2trW0s7OztLS2trW0tLS0tLS1tra1tbS0tLS0tbW1tbW0tLS0tLS1');
+        audio.play();
+      } catch (e) {}
+      
+      // Update stats
+      if (currentType === 'focus' || currentType === 'deep' || currentType === 'ultra') {
+        const pomo = loadPomodoro();
+        pomo.today = (pomo.today || 0) + 1;
+        pomo.total = (pomo.total || 0) + 1;
+        Storage.save('pomodoro', pomo);
+        
+        showToast('🎉 Pomodoro selesai! Istirahat sejenak.', 'success');
+        
+        // Suggest break
+        setTimeout(() => {
+          if (confirm('Mau istirahat 5 menit?')) {
+            selectType('short');
+          }
+        }, 500);
+      } else {
+        showToast('✅ Istirahat selesai. Siap fokus lagi?', 'success');
+        setTimeout(() => {
+          selectType('focus');
+        }, 500);
+      }
+      
+      renderPomodoro();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '🍅 Pomodoro Timer' });
+      renderBottomNav('pomodoro');
+      renderPomodoro();
+    });
+  </script>
+</body>
+</html>

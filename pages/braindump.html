@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Brain Dump - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    let activeTab = 'braindump';
+    
+    function render() {
+      const main = document.getElementById('mainContent');
+      
+      main.innerHTML = `
+        <div class="toggle mb-3">
+          <button class="toggle-btn ${activeTab==='braindump'?'active':''}" onclick="setTab('braindump')">💭 Brain Dump</button>
+          <button class="toggle-btn ${activeTab==='dontlist'?'active':''}" onclick="setTab('dontlist')">🚫 Don't List</button>
+        </div>
+        
+        ${activeTab === 'braindump' ? renderBrainDump() : renderDontList()}
+      `;
+    }
+    
+    function renderBrainDump() {
+      const dumps = loadBrainDump();
+      
+      return `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:none;">
+          <p style="font-size:13px;color:#e65100;margin:0;">💭 Keluarkan semua pikiran tanpa filter. Proses nanti.</p>
+        </div>
+        
+        <div class="form-group">
+          <textarea class="form-input form-textarea" id="dumpText" rows="3" placeholder="Apa yang ada di pikiranmu?"></textarea>
+        </div>
+        <button class="btn btn-primary btn-full mb-3" onclick="addDump()">➕ Simpan</button>
+        
+        <h3 style="font-size:14px;margin-bottom:12px;">📋 Daftar (${dumps.length})</h3>
+        
+        ${dumps.length ? dumps.map(d => `
+          <div class="card" style="padding:12px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <p style="font-size:13px;margin:0;flex:1;">${d.text}</p>
+              <div style="display:flex;gap:4px;margin-left:8px;">
+                <button style="background:none;border:none;font-size:14px;cursor:pointer;" onclick="convertToTask('${d.id}')" title="Jadikan Task">✅</button>
+                <button style="background:none;border:none;font-size:14px;cursor:pointer;" onclick="deleteDump('${d.id}')" title="Hapus">🗑️</button>
+              </div>
+            </div>
+            <div style="font-size:10px;color:#999;margin-top:6px;">${new Date(d.createdAt).toLocaleString('id-ID')}</div>
+          </div>
+        `).join('') : '<div class="empty-state"><p>Belum ada catatan</p></div>'}
+      `;
+    }
+    
+    function renderDontList() {
+      const list = Storage.load('dontlist', []);
+      
+      return `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#ffebee,#ffcdd2);border:none;">
+          <p style="font-size:13px;color:#c62828;margin:0;">🚫 Hal-hal yang harus dihindari untuk mencapai tujuanmu.</p>
+        </div>
+        
+        <div class="form-group">
+          <input type="text" class="form-input" id="dontText" placeholder="Apa yang harus dihindari?">
+        </div>
+        <button class="btn btn-primary btn-full mb-3" onclick="addDont()">➕ Tambah</button>
+        
+        <h3 style="font-size:14px;margin-bottom:12px;">📋 Don't List (${list.length})</h3>
+        
+        ${list.length ? list.map(d => `
+          <div class="card" style="padding:12px;margin-bottom:8px;border-left:3px solid ${d.status==='obeyed'?'#4caf50':d.status==='violated'?'#f44336':'#ddd'};">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <p style="font-size:13px;margin:0;">🚫 ${d.text}</p>
+              <div style="display:flex;gap:4px;">
+                <button style="width:28px;height:28px;border-radius:50%;border:1px solid #ccc;background:${d.status==='obeyed'?'#e8f5e9':'white'};cursor:pointer;" onclick="setDontStatus('${d.id}','obeyed')" title="Berhasil">✓</button>
+                <button style="width:28px;height:28px;border-radius:50%;border:1px solid #ccc;background:${d.status==='violated'?'#ffebee':'white'};cursor:pointer;" onclick="setDontStatus('${d.id}','violated')" title="Dilanggar">✗</button>
+                <button style="background:none;border:none;font-size:14px;cursor:pointer;" onclick="deleteDont('${d.id}')">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `).join('') : '<div class="empty-state"><p>Belum ada item</p></div>'}
+      `;
+    }
+    
+    function setTab(tab) { activeTab = tab; render(); }
+    
+    function addDump() {
+      const text = document.getElementById('dumpText')?.value.trim();
+      if (!text) { showToast('Tulis sesuatu', 'error'); return; }
+      const dumps = loadBrainDump();
+      dumps.unshift({ id: generateId(), text, createdAt: new Date().toISOString() });
+      Storage.save('braindump', dumps);
+      showToast('✓ Tersimpan', 'success');
+      render();
+    }
+    
+    function deleteDump(id) {
+      let dumps = loadBrainDump();
+      dumps = dumps.filter(d => d.id !== id);
+      Storage.save('braindump', dumps);
+      render();
+    }
+    
+    function convertToTask(id) {
+      const dumps = loadBrainDump();
+      const dump = dumps.find(d => d.id === id);
+      if (dump) {
+        const tasks = loadTasks();
+        tasks.push({ id: generateId(), title: dump.text, priority: 'medium', done: false, status: 'backlog', createdAt: new Date().toISOString() });
+        Storage.save('tasks', tasks);
+        deleteDump(id);
+        showToast('✓ Dijadikan task', 'success');
+      }
+    }
+    
+    function addDont() {
+      const text = document.getElementById('dontText')?.value.trim();
+      if (!text) { showToast('Tulis sesuatu', 'error'); return; }
+      const list = Storage.load('dontlist', []);
+      list.unshift({ id: generateId(), text, status: null, createdAt: new Date().toISOString() });
+      Storage.save('dontlist', list);
+      showToast('✓ Ditambahkan', 'success');
+      render();
+    }
+    
+    function setDontStatus(id, status) {
+      const list = Storage.load('dontlist', []);
+      const item = list.find(d => d.id === id);
+      if (item) {
+        item.status = item.status === status ? null : status;
+        Storage.save('dontlist', list);
+        render();
+      }
+    }
+    
+    function deleteDont(id) {
+      let list = Storage.load('dontlist', []);
+      list = list.filter(d => d.id !== id);
+      Storage.save('dontlist', list);
+      render();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '💭 Brain Dump' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>

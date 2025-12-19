@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Jurnal - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    let activeTab = 'morning';
+    
+    function render() {
+      const main = document.getElementById('mainContent');
+      const journal = loadJournal();
+      
+      main.innerHTML = `
+        <!-- Tabs -->
+        <div class="toggle mb-3">
+          <button class="toggle-btn ${activeTab==='morning'?'active':''}" onclick="setTab('morning')">☀️ Pagi</button>
+          <button class="toggle-btn ${activeTab==='evening'?'active':''}" onclick="setTab('evening')">🌙 Malam</button>
+        </div>
+        
+        ${activeTab === 'morning' ? renderMorning(journal) : renderEvening(journal)}
+      `;
+    }
+    
+    function renderMorning(journal) {
+      const data = journal.morning;
+      
+      if (data) {
+        return `
+          <div class="card" style="background:linear-gradient(135deg,#fff8e1,#ffecb3);border:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <h3 style="font-size:16px;">☀️ Jurnal Pagi</h3>
+              <span class="badge badge-success">✓ Selesai</span>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">🙏 Yang Kusyukuri</div>
+              <p style="font-size:14px;white-space:pre-line;">${data.gratitude || '-'}</p>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">🎯 Fokus Utama</div>
+              <p style="font-size:14px;">${data.focus || '-'}</p>
+            </div>
+            
+            <div>
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">💪 Afirmasi</div>
+              <p style="font-size:14px;">${data.affirmation || '-'}</p>
+            </div>
+            
+            <button class="btn btn-secondary btn-full mt-3" onclick="editMorning()">✏️ Edit</button>
+          </div>
+        `;
+      }
+      
+      return `
+        <div class="card">
+          <h3 style="font-size:16px;margin-bottom:16px;">☀️ Jurnal Pagi</h3>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Mulai harimu dengan kesadaran dan niat baik</p>
+          
+          <div class="form-group">
+            <label class="form-label">🙏 3 Hal yang Kusyukuri</label>
+            <textarea class="form-input form-textarea" id="gratitude" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">🎯 Fokus Utama Hari Ini</label>
+            <input type="text" class="form-input" id="focus" placeholder="Satu hal terpenting yang harus selesai...">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">💪 Afirmasi Positif</label>
+            <input type="text" class="form-input" id="affirmation" placeholder="Hari ini aku akan...">
+          </div>
+          
+          <button class="btn-submit" onclick="saveMorning()">Simpan Jurnal Pagi</button>
+        </div>
+      `;
+    }
+    
+    function renderEvening(journal) {
+      const data = journal.evening;
+      
+      if (data) {
+        return `
+          <div class="card" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9);border:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <h3 style="font-size:16px;">🌙 Jurnal Malam</h3>
+              <span class="badge badge-success">✓ Selesai</span>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">🏆 Kemenangan Hari Ini</div>
+              <p style="font-size:14px;white-space:pre-line;">${data.wins || '-'}</p>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">📈 Yang Bisa Ditingkatkan</div>
+              <p style="font-size:14px;">${data.improve || '-'}</p>
+            </div>
+            
+            <div>
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">💡 Pelajaran Hari Ini</div>
+              <p style="font-size:14px;">${data.lesson || '-'}</p>
+            </div>
+            
+            <button class="btn btn-secondary btn-full mt-3" onclick="editEvening()">✏️ Edit</button>
+          </div>
+        `;
+      }
+      
+      return `
+        <div class="card">
+          <h3 style="font-size:16px;margin-bottom:16px;">🌙 Jurnal Malam</h3>
+          <p style="font-size:13px;color:#666;margin-bottom:16px;">Refleksikan harimu dan siapkan besok lebih baik</p>
+          
+          <div class="form-group">
+            <label class="form-label">🏆 3 Kemenangan Hari Ini</label>
+            <textarea class="form-input form-textarea" id="wins" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">📈 Yang Bisa Ditingkatkan</label>
+            <textarea class="form-input form-textarea" id="improve" rows="2" placeholder="Besok aku akan..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">💡 Pelajaran Hari Ini</label>
+            <input type="text" class="form-input" id="lesson" placeholder="Aku belajar bahwa...">
+          </div>
+          
+          <button class="btn-submit" onclick="saveEvening()">Simpan Jurnal Malam</button>
+        </div>
+      `;
+    }
+    
+    function setTab(tab) {
+      activeTab = tab;
+      render();
+    }
+    
+    function saveMorning() {
+      const journal = loadJournal();
+      journal.morning = {
+        gratitude: document.getElementById('gratitude')?.value || '',
+        focus: document.getElementById('focus')?.value || '',
+        affirmation: document.getElementById('affirmation')?.value || '',
+        time: new Date().toISOString()
+      };
+      Storage.saveToday('journal', journal);
+      showToast('✓ Jurnal pagi tersimpan', 'success');
+      render();
+    }
+    
+    function saveEvening() {
+      const journal = loadJournal();
+      journal.evening = {
+        wins: document.getElementById('wins')?.value || '',
+        improve: document.getElementById('improve')?.value || '',
+        lesson: document.getElementById('lesson')?.value || '',
+        time: new Date().toISOString()
+      };
+      Storage.saveToday('journal', journal);
+      showToast('✓ Jurnal malam tersimpan', 'success');
+      render();
+    }
+    
+    function editMorning() {
+      const journal = loadJournal();
+      journal.morning = null;
+      Storage.saveToday('journal', journal);
+      render();
+    }
+    
+    function editEvening() {
+      const journal = loadJournal();
+      journal.evening = null;
+      Storage.saveToday('journal', journal);
+      render();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '📓 Jurnal' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>

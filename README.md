@@ -1,114 +1,123 @@
-# 🌙 Sync Planner v2.0
+# 🕌 Sync Planner - Multi-Page Edition
 
-Aplikasi produktivitas Islami dengan fitur **Healthy Break Integration**.
+Aplikasi produktivitas Islami dengan struktur multi-file yang terorganisir.
 
 ## 📁 Struktur File
 
 ```
-sync-planner-v2/
-├── index.html        # HTML utama (347 baris)
-├── styles.css        # Semua CSS (1466 baris)
-├── app.js            # Logic utama (807 baris)
-├── healthy-break.js  # Modul istirahat sehat (873 baris)
-└── README.md         # Dokumentasi ini
+sync-planner/
+├── index.html              # Home + Header + Nav
+├── css/
+│   ├── base.css           # Reset, Variables, Typography (3KB)
+│   ├── components.css     # Cards, Buttons, Forms, Modals (7KB)
+│   ├── layout.css         # Header, Nav, Pages (4KB)
+│   └── features.css       # Sholat, Habits, Tasks, dll (18KB)
+├── js/
+│   ├── data.js            # Storage, State, Static Data (17KB)
+│   └── app.js             # Core Navigation & Functions (8KB)
+└── pages/
+    ├── tasks.html         # Tasks & Kanban Board
+    ├── goals.html         # Goals 12 Minggu
+    ├── pomodoro.html      # Pomodoro Timer (5 tipe)
+    ├── ibadah.html        # Sholat & Dzikir Tracker
+    ├── habits.html        # Sunnah Rasul (11 habits)
+    ├── journal.html       # Jurnal Pagi/Malam
+    ├── vision.html        # Piramida Visi (10/3/1 tahun)
+    ├── review.html        # Weekly Review
+    ├── wisdom.html        # Wisdom Stoik (30 situasi)
+    ├── braindump.html     # Brain Dump & Don't List
+    └── settings.html      # Pengaturan
 ```
 
-## ✨ Fitur Utama
+## ✅ Fitur Lengkap
 
-### 🏠 Home
-- Wisdom Card (kutipan Islami random)
-- Habit tracker harian
-- Preview tugas hari ini
-- Dzikir counter cepat
+### 🏠 Home Page
+- Quote Card dengan refresh
+- Quick Actions (Fokus, Task, Jurnal, Wisdom)
+- Jurnal Pagi/Malam status cards
+- Wisdom of the Day card
+- Sholat Tracker mini (8 waktu)
+- Sunnah Rasul mini (11 habits)
+- Today Focus tasks
+- Jadwal Hari Ini (Best Week Template)
 
-### 📋 Tugas
-- CRUD tugas dengan prioritas
-- Start Pomodoro dari tugas
-- Filter pending/selesai
+### 📋 Produktivitas
+- **Tasks** - List view + Kanban board (4 kolom)
+- **Goals 12 Minggu** - Dengan progress & milestones
+- **Pomodoro Timer** - 5 tipe: Focus(25), Short(5), Long(15), Deep(45), Ultra(90)
+- **Brain Dump** - Capture pikiran, convert to task
 
-### 🍅 Pomodoro Timer
-- 5 tipe timer: Fokus (25m), Istirahat (5m), Panjang (15m), Deep Work (45m), Ultra (90m)
-- Progress ring visual
-- Pilih tugas sebelum mulai
+### 🕌 Ibadah
+- **Tracker Sholat** - 8 waktu (5 fardhu + 3 sunnah)
+- **Sunnah Rasul** - 11 kebiasaan grouped by time
+- **Dzikir Pagi/Sore** - 15+15 dzikir dengan fullscreen counter
 
-### 🧘 Healthy Break (BARU!)
-- Pengingat istirahat sehat setelah Pomodoro
-- 6 pilihan aktivitas:
-  - 🧘 Stretching (2 menit)
-  - 💧 Wudhu (3 menit) - direkomendasikan setelah 90 menit
-  - 🚶 Jalan Keluar (5 menit)
-  - 💪 Push-up Ringan (2 menit)
-  - 📿 Dzikir Singkat (2 menit)
-  - 👁️ Istirahat Mata (1 menit)
-- Timer countdown dengan langkah-langkah
-- Streak tracking
-- Sedona Method prompts
+### 📝 Refleksi
+- **Jurnal Pagi** - Syukur, Fokus, Afirmasi
+- **Jurnal Malam** - Wins, Improve, Lesson
+- **Don't List** - Hal yang dihindari dengan tracking
+- **Weekly Review** - Evaluasi mingguan
 
-### 📊 Refleksi
-- Statistik harian (tugas, pomodoro, habit)
-- Healthy Break stats
-- Journaling syukur
-- Refleksi malam
+### 🎯 Visi & Planning
+- **Piramida Visi** - 10, 3, 1 tahun
+- **Best Week Template** - Jadwal ideal weekday/weekend
+
+### 🧠 Wisdom
+- **30 Situasi Wisdom** - 10 detailed + 20 summary
+- Filter by area (Istri, Anak, Diri)
+- Search functionality
+- 4 framework: Stoic, NLP, Sedona, Atomic
 
 ### ⚙️ Settings
-- Notifikasi, suara, getaran
-- Pengaturan Healthy Break
-- Export/hapus data
+- Export/Import data (JSON)
+- Clear all data
+- Toggle notifications & sound
 
-## 🚀 Cara Pakai
+## 🚀 Cara Penggunaan
 
-1. Buka semua 4 file di folder yang sama
-2. Buka `index.html` di browser
-3. Atau host di server lokal
-
-### Testing Lokal
-```bash
-# Dengan Python
-cd sync-planner-v2
-python -m http.server 8000
-# Buka http://localhost:8000
-
-# Atau dengan Node.js
-npx serve .
-```
+1. Buka `index.html` di browser
+2. Navigasi lewat bottom nav atau menu
+3. Semua data tersimpan di localStorage
 
 ## 💾 Data Storage
 
-Semua data disimpan di **localStorage**:
-- `syncPlannerTasks` - Daftar tugas
-- `syncPlannerHabits` - Habit & streak
-- `syncPlannerJournals` - Jurnal
-- `syncPlannerSettings` - Pengaturan
-- `sync_YYYY-MM-DD` - Data harian
-- `healthyBreak_YYYY-MM-DD` - Stats istirahat
-- `healthyBreakStreak` - Streak persistent
-- `healthyBreakSettings` - Setting istirahat
+Prefix: `sync_`
+- `sync_tasks` - Daftar task
+- `sync_goals` - Goals 12 minggu
+- `sync_sholat` - Tracker sholat (per hari)
+- `sync_habits` - Sunnah rasul (per hari)
+- `sync_dzikir` - Progress dzikir (per hari)
+- `sync_journal` - Jurnal pagi/malam (per hari)
+- `sync_pomodoro` - Stats pomodoro
+- `sync_braindump` - Brain dump items
+- `sync_dontlist` - Don't list items
+- `sync_vision` - Piramida visi
 
-## 🔧 Integrasi Healthy Break
+## 📊 Total Size
 
-Healthy Break otomatis trigger setelah sesi Pomodoro selesai (kecuali istirahat). Kode integrasi ada di `app.js`:
+| Folder | Size |
+|--------|------|
+| CSS | ~32 KB |
+| JS | ~25 KB |
+| Pages | ~83 KB |
+| **Total** | **~147 KB** |
 
-```javascript
-// Di completePomodoro()
-if (isWorkSession && typeof triggerHealthyBreakReminder === 'function') {
-  setTimeout(() => {
-    triggerHealthyBreakReminder({
-      type: state.pomodoro.type,
-      duration: durationMinutes,
-      totalMinutesToday: totalMinutesToday,
-      task: state.pomodoro.task || ''
-    });
-  }, 1500);
+## 🎨 Customization
+
+Edit `css/base.css` untuk mengubah warna:
+```css
+:root {
+  --primary: #0D47A1;
+  --secondary: #00695C;
+  --accent: #FF6F00;
+  --success: #2E7D32;
+  --danger: #C62828;
+  --spiritual: #6A1B9A;
 }
 ```
 
-## 📱 PWA Ready
-
-Untuk membuat PWA, tambahkan:
-1. `manifest.json`
-2. `service-worker.js`
-3. Icons (192x192, 512x512)
-
 ---
 
-**Made with ❤️ for productivity & spirituality**
+بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+
+*Sync Planner v2.0 - Multi-Page Edition*

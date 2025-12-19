@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Wisdom Stoik - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+  <style>
+    .wisdom-card{background:white;border-radius:12px;padding:14px;margin-bottom:12px;cursor:pointer;transition:all 0.2s;border-left:4px solid #0d47a1}
+    .wisdom-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .wisdom-card.area-istri{border-left-color:#c49a6c}
+    .wisdom-card.area-anak{border-left-color:#a08bc4}
+    .wisdom-card.area-diri{border-left-color:#2d9a8c}
+    .wisdom-header{display:flex;gap:10px;align-items:center}
+    .wisdom-icon{font-size:24px}
+    .wisdom-title{font-size:14px;font-weight:600}
+    .wisdom-id{font-size:10px;color:#666}
+    .wisdom-principle{font-size:12px;color:#666;margin-top:8px;font-style:italic}
+    .filter-chips{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid #ddd;background:white;cursor:pointer}
+    .chip.active{background:#0d47a1;color:white;border-color:#0d47a1}
+  </style>
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    // Wisdom Data (20 detailed + 60 summary)
+    const WISDOM = [
+      { id:'W001', icon:'😤', title:'Istri Mengomel Panjang', area:'istri', p:'الصبر مفتاح الفرج', pm:'Kesabaran adalah kunci', detail:true, trigger:'Istri mengomel', wrong:['Membalas','Mengabaikan'], right:['Dengarkan','Validasi'], stoic:'Fokus respons', nlp:'Reframe kebutuhan', sedona:'Lepas ego', atomic:'Napas 3x' },
+      { id:'W002', icon:'😢', title:'Anak Tantrum', area:'anak', p:'اللين يفتح القلوب', pm:'Kelembutan membuka hati', detail:true, trigger:'Anak menangis di publik', wrong:['Membentak','Menyeret'], right:['Tenang','Peluk'], stoic:'Pandangan orang bukan kontrol', nlp:'Anchor tenang', sedona:'Lepas malu', atomic:'Jongkok sejajar' },
+      { id:'W003', icon:'💼', title:'Pekerjaan Menumpuk', area:'diri', p:'خير العمل أدومه', pm:'Konsistensi terbaik', detail:true, trigger:'Deadline banyak', wrong:['Panik','Prokrastinasi'], right:['Prioritas','Fokus satu'], stoic:'Satu tugas depan', nlp:'Chunk down', sedona:'Lepas sempurna', atomic:'2-minute rule' },
+      { id:'W004', icon:'😔', title:'Istri Diam Dingin', area:'istri', p:'الكلمة الطيبة صدقة', pm:'Kata baik sedekah', detail:true },
+      { id:'W005', icon:'📱', title:'Anak Kecanduan Gadget', area:'anak', p:'القدوة خير', pm:'Teladan terbaik', detail:true },
+      { id:'W006', icon:'😴', title:'Bangun Kesiangan', area:'diri', p:'البركة في البكور', pm:'Berkah di pagi', detail:true },
+      { id:'W007', icon:'💔', title:'Istri Kecewa Berat', area:'istri', p:'الاعتراف بالخطأ', pm:'Akui kesalahan', detail:true },
+      { id:'W008', icon:'🎓', title:'Anak Malas Belajar', area:'anak', p:'العلم بالتعلم', pm:'Ilmu dengan belajar', detail:true },
+      { id:'W009', icon:'💰', title:'Tekanan Finansial', area:'diri', p:'الرزق بيد الله', pm:'Rezeki di tangan Allah', detail:true },
+      { id:'W010', icon:'🤝', title:'Istri Minta Perhatian', area:'istri', p:'إذا حضرت فاحضر', pm:'Hadir sepenuhnya', detail:true },
+      { id:'W011', icon:'😡', title:'Anak Membantah', area:'anak', p:'الحوار قبل القرار', pm:'Dialog dulu' },
+      { id:'W012', icon:'🔥', title:'Kehilangan Motivasi', area:'diri', p:'إنما الأعمال بالنيات', pm:'Niat menentukan' },
+      { id:'W013', icon:'💑', title:'Romantisme Berkurang', area:'istri', p:'المودة والرحمة', pm:'Cinta kasih' },
+      { id:'W014', icon:'📚', title:'Anak Berbohong', area:'anak', p:'الصدق منجاة', pm:'Jujur keselamatan' },
+      { id:'W015', icon:'😓', title:'Burnout', area:'diri', p:'لنفسك عليك حق', pm:'Diri punya hak' },
+      { id:'W016', icon:'🏠', title:'Istri Komplain Rumah', area:'istri', p:'التعاون على البر', pm:'Tolong-menolong' },
+      { id:'W017', icon:'👊', title:'Anak Berkelahi Saudara', area:'anak', p:'العدل بين الأولاد', pm:'Adil antar anak' },
+      { id:'W018', icon:'📵', title:'Prokrastinasi Digital', area:'diri', p:'الوقت كالسيف', pm:'Waktu bagai pedang' },
+      { id:'W019', icon:'💬', title:'Istri Curhat Panjang', area:'istri', p:'استمع لتفهم', pm:'Dengar untuk paham' },
+      { id:'W020', icon:'🌙', title:'Anak Susah Tidur', area:'anak', p:'النوم المبكر صحة', pm:'Tidur awal sehat' },
+      { id:'W021', icon:'🗣️', title:'Istri Membandingkan', area:'istri', p:'القناعة كنز', pm:'Qanaah harta' },
+      { id:'W022', icon:'🎮', title:'Anak Tak Mau Berhenti Main', area:'anak', p:'الاعتدال', pm:'Keseimbangan' },
+      { id:'W023', icon:'😤', title:'Marah Tanpa Sebab', area:'diri', p:'الغضب يفسد', pm:'Marah merusak' },
+      { id:'W024', icon:'💭', title:'Istri Cemburu', area:'istri', p:'الغيرة من الإيمان', pm:'Cemburu dari iman' },
+      { id:'W025', icon:'🤕', title:'Anak Sakit', area:'anak', p:'الصبر عند البلاء', pm:'Sabar saat ujian' },
+      { id:'W026', icon:'😰', title:'Anxiety', area:'diri', p:'التوكل على الله', pm:'Tawakkal' },
+      { id:'W027', icon:'👨‍👩‍👧', title:'Beda Pola Asuh', area:'istri', p:'الشورى', pm:'Musyawarah' },
+      { id:'W028', icon:'📝', title:'Anak Nilai Jelek', area:'anak', p:'الفشل بداية', pm:'Gagal awal sukses' },
+      { id:'W029', icon:'🎯', title:'Tidak Bisa Fokus', area:'diri', p:'الإتقان', pm:'Kesempurnaan' },
+      { id:'W030', icon:'🏃', title:'Istri Lelah Urus Anak', area:'istri', p:'خير الناس', pm:'Sebaik manusia' }
+    ];
+    
+    let activeFilter = 'semua';
+    
+    function render() {
+      const main = document.getElementById('mainContent');
+      const filtered = activeFilter === 'semua' ? WISDOM : WISDOM.filter(w => w.area === activeFilter);
+      
+      main.innerHTML = `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9);border:none;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">🏛️</div>
+          <div style="font-size:24px;font-weight:700;color:#1a237e;">${WISDOM.length}</div>
+          <div style="font-size:13px;color:#3949ab;">Situasi Wisdom</div>
+        </div>
+        
+        <div class="filter-chips">
+          <div class="chip ${activeFilter==='semua'?'active':''}" onclick="setFilter('semua')">Semua</div>
+          <div class="chip ${activeFilter==='istri'?'active':''}" onclick="setFilter('istri')">👩 Istri</div>
+          <div class="chip ${activeFilter==='anak'?'active':''}" onclick="setFilter('anak')">👶 Anak</div>
+          <div class="chip ${activeFilter==='diri'?'active':''}" onclick="setFilter('diri')">🧘 Diri</div>
+        </div>
+        
+        <input type="text" class="form-input mb-3" placeholder="🔍 Cari situasi..." oninput="search(this.value)">
+        
+        <div id="wisdomList">
+          ${filtered.map(w => `
+            <div class="wisdom-card area-${w.area}" onclick="showDetail('${w.id}')">
+              <div class="wisdom-header">
+                <div class="wisdom-icon">${w.icon}</div>
+                <div>
+                  <div class="wisdom-id">${w.id}</div>
+                  <div class="wisdom-title">${w.title}</div>
+                </div>
+              </div>
+              <div class="wisdom-principle">${w.pm}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    function setFilter(f) {
+      activeFilter = f;
+      render();
+    }
+    
+    function search(q) {
+      const list = document.getElementById('wisdomList');
+      const filtered = WISDOM.filter(w => 
+        (activeFilter === 'semua' || w.area === activeFilter) &&
+        (w.title.toLowerCase().includes(q.toLowerCase()) || w.pm.toLowerCase().includes(q.toLowerCase()))
+      );
+      list.innerHTML = filtered.map(w => `
+        <div class="wisdom-card area-${w.area}" onclick="showDetail('${w.id}')">
+          <div class="wisdom-header">
+            <div class="wisdom-icon">${w.icon}</div>
+            <div><div class="wisdom-id">${w.id}</div><div class="wisdom-title">${w.title}</div></div>
+          </div>
+          <div class="wisdom-principle">${w.pm}</div>
+        </div>
+      `).join('');
+    }
+    
+    function showDetail(id) {
+      const w = WISDOM.find(x => x.id === id);
+      if (!w) return;
+      
+      openModal(`
+        <div class="modal">
+          <div class="modal-header">
+            <h3 class="modal-title">${w.icon} ${w.title}</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div style="background:linear-gradient(135deg,rgba(13,71,161,0.1),rgba(13,71,161,0.05));border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
+              <div style="font-family:'Amiri',serif;font-size:20px;color:#0d47a1;">${w.p}</div>
+              <div style="font-size:13px;color:#666;">${w.pm}</div>
+            </div>
+            
+            ${w.detail ? `
+              <div style="margin-bottom:16px;">
+                <div style="font-size:11px;color:#0d47a1;text-transform:uppercase;margin-bottom:6px;">Trigger</div>
+                <p style="font-size:13px;">${w.trigger || '-'}</p>
+              </div>
+              
+              <div style="margin-bottom:16px;">
+                <div style="font-size:11px;color:#c62828;text-transform:uppercase;margin-bottom:6px;">❌ Respons Salah</div>
+                <ul style="font-size:13px;padding-left:20px;color:#666;">${(w.wrong||[]).map(r=>'<li>'+r+'</li>').join('')}</ul>
+              </div>
+              
+              <div style="margin-bottom:16px;">
+                <div style="font-size:11px;color:#2e7d32;text-transform:uppercase;margin-bottom:6px;">✅ Respons Benar</div>
+                <ul style="font-size:13px;padding-left:20px;color:#666;">${(w.right||[]).map(r=>'<li>'+r+'</li>').join('')}</ul>
+              </div>
+              
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="padding:10px;background:#f5f5f5;border-radius:8px;font-size:11px;">
+                  <div style="color:#0d47a1;font-weight:600;">🏛️ Stoic</div>
+                  <div style="color:#666;margin-top:4px;">${w.stoic||'-'}</div>
+                </div>
+                <div style="padding:10px;background:#f5f5f5;border-radius:8px;font-size:11px;">
+                  <div style="color:#6a1b9a;font-weight:600;">🧠 NLP</div>
+                  <div style="color:#666;margin-top:4px;">${w.nlp||'-'}</div>
+                </div>
+                <div style="padding:10px;background:#f5f5f5;border-radius:8px;font-size:11px;">
+                  <div style="color:#00695c;font-weight:600;">🦋 Sedona</div>
+                  <div style="color:#666;margin-top:4px;">${w.sedona||'-'}</div>
+                </div>
+                <div style="padding:10px;background:#f5f5f5;border-radius:8px;font-size:11px;">
+                  <div style="color:#e65100;font-weight:600;">⚛️ Atomic</div>
+                  <div style="color:#666;margin-top:4px;">${w.atomic||'-'}</div>
+                </div>
+              </div>
+            ` : '<p style="text-align:center;color:#999;padding:20px;">Detail lengkap segera hadir...</p>'}
+          </div>
+        </div>
+      `);
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '🏛️ Wisdom Stoik' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Pengaturan - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function render() {
+      const main = document.getElementById('mainContent');
+      const settings = Storage.load('settings', { notifications: true, darkMode: false, soundEnabled: true });
+      
+      main.innerHTML = `
+        <div class="card mb-3">
+          <h4 style="font-size:14px;margin-bottom:16px;">👤 Profil</h4>
+          <div class="form-group">
+            <label class="form-label">Nama</label>
+            <input type="text" class="form-input" id="userName" value="${Storage.load('userName', '')}" placeholder="Nama kamu">
+          </div>
+          <button class="btn btn-primary btn-full" onclick="saveName()">Simpan</button>
+        </div>
+        
+        <div class="card mb-3">
+          <h4 style="font-size:14px;margin-bottom:16px;">⚙️ Pengaturan</h4>
+          
+          <div class="settings-item">
+            <div>
+              <div class="label">🔔 Notifikasi</div>
+              <div class="desc">Pengingat sholat & dzikir</div>
+            </div>
+            <div class="toggle-switch ${settings.notifications ? 'active' : ''}" onclick="toggleSetting('notifications')"></div>
+          </div>
+          
+          <div class="settings-item">
+            <div>
+              <div class="label">🔊 Suara</div>
+              <div class="desc">Suara timer & notifikasi</div>
+            </div>
+            <div class="toggle-switch ${settings.soundEnabled ? 'active' : ''}" onclick="toggleSetting('soundEnabled')"></div>
+          </div>
+          
+          <div class="settings-item">
+            <div>
+              <div class="label">🌙 Mode Gelap</div>
+              <div class="desc">Tema gelap (coming soon)</div>
+            </div>
+            <div class="toggle-switch ${settings.darkMode ? 'active' : ''}" onclick="toggleSetting('darkMode')"></div>
+          </div>
+        </div>
+        
+        <div class="card mb-3">
+          <h4 style="font-size:14px;margin-bottom:16px;">📊 Data</h4>
+          
+          <button class="btn btn-secondary btn-full mb-2" onclick="exportData()">📤 Export Data</button>
+          <button class="btn btn-secondary btn-full mb-2" onclick="importData()">📥 Import Data</button>
+          <button class="btn btn-full" style="background:#ffebee;color:#c62828;" onclick="clearData()">🗑️ Hapus Semua Data</button>
+        </div>
+        
+        <div class="card" style="background:#f5f5f5;border:none;text-align:center;">
+          <div style="font-size:24px;margin-bottom:8px;">🕌</div>
+          <h4 style="font-size:14px;margin-bottom:4px;">Sync Planner</h4>
+          <p style="font-size:12px;color:#666;margin:0;">Islamic Productivity App</p>
+          <p style="font-size:11px;color:#999;margin:8px 0 0 0;">Version 2.0 • Multi-Page Edition</p>
+        </div>
+      `;
+    }
+    
+    function saveName() {
+      const name = document.getElementById('userName')?.value.trim();
+      Storage.save('userName', name);
+      showToast('✓ Nama tersimpan', 'success');
+    }
+    
+    function toggleSetting(key) {
+      const settings = Storage.load('settings', { notifications: true, darkMode: false, soundEnabled: true });
+      settings[key] = !settings[key];
+      Storage.save('settings', settings);
+      render();
+    }
+    
+    function exportData() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('sync_')) {
+          data[key] = localStorage.getItem(key);
+        }
+      }
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sync-planner-backup-' + new Date().toISOString().split('T')[0] + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('✓ Data diexport', 'success');
+    }
+    
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            Object.keys(data).forEach(key => {
+              localStorage.setItem(key, data[key]);
+            });
+            showToast('✓ Data diimport', 'success');
+            render();
+          } catch (err) {
+            showToast('File tidak valid', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    
+    function clearData() {
+      if (!confirm('Yakin hapus semua data? Tindakan ini tidak bisa dibatalkan.')) return;
+      if (!confirm('Benar-benar yakin? Semua progress akan hilang.')) return;
+      
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('sync_')) keys.push(key);
+      }
+      keys.forEach(key => localStorage.removeItem(key));
+      
+      showToast('Data dihapus', 'success');
+      render();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '⚙️ Pengaturan' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>

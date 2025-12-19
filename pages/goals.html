@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Goals - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function renderGoals() {
+      const main = document.getElementById('mainContent');
+      const goals = loadGoals();
+      
+      main.innerHTML = `
+        <div class="page-header">
+          <h2 class="page-title">🎯 Goals 12 Minggu</h2>
+          <p class="page-subtitle">Fokus pada 3-5 goal terpenting</p>
+        </div>
+        
+        <button class="btn btn-primary btn-full mb-3" onclick="showAddGoal()">➕ Tambah Goal</button>
+        
+        ${goals.length ? goals.map((g, i) => `
+          <div class="goal-card">
+            <div class="goal-card-header">
+              <div class="goal-card-top">
+                <div class="goal-rank r${Math.min(i+1, 5)}">${i + 1}</div>
+                <div class="goal-info">
+                  <div class="goal-title">${g.title}</div>
+                  <div class="goal-meta">${g.milestones?.length || 0} milestones • ${g.progress || 0}%</div>
+                </div>
+              </div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar" style="width:${g.progress || 0}%"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn btn-sm btn-secondary" onclick="updateProgress('${g.id}')">📊 Update</button>
+              <button class="btn btn-sm btn-secondary" onclick="showMilestones('${g.id}')">🎯 Milestones</button>
+              <button class="btn btn-sm" style="margin-left:auto;background:none;color:#c62828;" onclick="deleteGoal('${g.id}')">🗑️</button>
+            </div>
+          </div>
+        `).join('') : `
+          <div class="empty-state">
+            <div class="icon">🎯</div>
+            <p>Belum ada goals</p>
+            <p style="font-size:12px;margin-top:8px;">Tetapkan 3-5 goal untuk 12 minggu ke depan</p>
+          </div>
+        `}
+        
+        <div class="card mt-4" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;">
+          <h4 style="font-size:14px;margin-bottom:8px;">💡 Tips Goals 12 Minggu</h4>
+          <ul style="font-size:12px;color:#666;padding-left:16px;margin:0;">
+            <li>Fokus pada maksimal 5 goals</li>
+            <li>Buat goals yang SMART</li>
+            <li>Review progress setiap minggu</li>
+            <li>Pecah menjadi milestone mingguan</li>
+          </ul>
+        </div>
+      `;
+    }
+    
+    function showAddGoal() {
+      openModal(`
+        <div class="modal">
+          <div class="modal-header">
+            <h3 class="modal-title">🎯 Tambah Goal</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Goal 12 Minggu</label>
+              <input type="text" class="form-input" id="goalTitle" placeholder="Apa yang ingin dicapai?">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kenapa ini penting?</label>
+              <textarea class="form-input form-textarea" id="goalWhy" rows="2" placeholder="Motivasi..."></textarea>
+            </div>
+            <button class="btn-submit" onclick="saveGoal()">Simpan Goal</button>
+          </div>
+        </div>
+      `);
+    }
+    
+    function saveGoal() {
+      const title = document.getElementById('goalTitle')?.value.trim();
+      if (!title) { showToast('Judul tidak boleh kosong', 'error'); return; }
+      
+      const goals = loadGoals();
+      goals.push({
+        id: generateId(),
+        title,
+        why: document.getElementById('goalWhy')?.value || '',
+        progress: 0,
+        milestones: [],
+        createdAt: new Date().toISOString()
+      });
+      Storage.save('goals', goals);
+      closeModal();
+      showToast('✓ Goal ditambahkan', 'success');
+      renderGoals();
+    }
+    
+    function updateProgress(id) {
+      const goals = loadGoals();
+      const goal = goals.find(g => g.id === id);
+      if (!goal) return;
+      
+      const progress = prompt('Progress saat ini (0-100):', goal.progress || 0);
+      if (progress !== null) {
+        goal.progress = Math.min(100, Math.max(0, parseInt(progress) || 0));
+        Storage.save('goals', goals);
+        renderGoals();
+        showToast('Progress diupdate', 'success');
+      }
+    }
+    
+    function showMilestones(id) {
+      const goals = loadGoals();
+      const goal = goals.find(g => g.id === id);
+      if (!goal) return;
+      
+      openModal(`
+        <div class="modal">
+          <div class="modal-header">
+            <h3 class="modal-title">🎯 Milestones</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size:13px;color:#666;margin-bottom:16px;">${goal.title}</p>
+            <div id="milestonesList">
+              ${(goal.milestones || []).map((m, i) => `
+                <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;">
+                  <span style="color:${m.done?'#4caf50':'#ccc'};">${m.done?'✓':'○'}</span>
+                  <span style="flex:1;${m.done?'text-decoration:line-through;color:#999;':''}">Minggu ${i+1}: ${m.text}</span>
+                </div>
+              `).join('') || '<p style="text-align:center;color:#999;">Belum ada milestone</p>'}
+            </div>
+            <div class="form-group mt-3">
+              <input type="text" class="form-input" id="newMilestone" placeholder="Tambah milestone...">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="addMilestone('${id}')">Tambah</button>
+          </div>
+        </div>
+      `);
+    }
+    
+    function addMilestone(goalId) {
+      const text = document.getElementById('newMilestone')?.value.trim();
+      if (!text) return;
+      
+      const goals = loadGoals();
+      const goal = goals.find(g => g.id === goalId);
+      if (goal) {
+        if (!goal.milestones) goal.milestones = [];
+        goal.milestones.push({ text, done: false });
+        Storage.save('goals', goals);
+        closeModal();
+        showMilestones(goalId);
+      }
+    }
+    
+    function deleteGoal(id) {
+      if (!confirm('Hapus goal ini?')) return;
+      let goals = loadGoals();
+      goals = goals.filter(g => g.id !== id);
+      Storage.save('goals', goals);
+      renderGoals();
+      showToast('Goal dihapus', 'success');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '🎯 Goals 12 Minggu' });
+      renderBottomNav('goals');
+      renderGoals();
+    });
+  </script>
+</body>
+</html>
