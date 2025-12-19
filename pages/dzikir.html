@@ -26,12 +26,12 @@
       const doneCount = DZIKIR_LIST.reduce((sum, d) => sum + Math.min(dzikir[d.id] || 0, d.count), 0);
       
       main.innerHTML = `
-        <div class="card mb-3" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;">
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:none;">
           <div style="text-align:center;">
-            <div style="font-size:32px;font-weight:700;color:#1976d2;">${completed}/${DZIKIR_LIST.length}</div>
-            <div style="font-size:13px;color:#1565c0;">Dzikir Selesai</div>
+            <div style="font-size:32px;font-weight:700;color:#2E7D32;">${completed}/${DZIKIR_LIST.length}</div>
+            <div style="font-size:13px;color:#1B5E20;">Dzikir Selesai</div>
             <div style="margin-top:8px;height:8px;background:rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;">
-              <div style="height:100%;width:${(doneCount/totalCount)*100}%;background:#1976d2;border-radius:4px;transition:width 0.3s;"></div>
+              <div style="height:100%;width:${(doneCount/totalCount)*100}%;background:#2E7D32;border-radius:4px;transition:width 0.3s;"></div>
             </div>
             <div style="font-size:11px;color:#666;margin-top:4px;">${doneCount}/${totalCount} bacaan</div>
           </div>
@@ -48,7 +48,7 @@
             const percent = Math.min(100, Math.round((count / d.count) * 100));
             return `
               <div class="dzikir-item ${done?'completed':''}" onclick="openDzikir('${d.id}')" style="position:relative;overflow:hidden;">
-                <div style="position:absolute;left:0;top:0;bottom:0;width:${percent}%;background:${done?'rgba(46,125,50,0.1)':'rgba(25,118,210,0.05)'};transition:width 0.3s;"></div>
+                <div style="position:absolute;left:0;top:0;bottom:0;width:${percent}%;background:${done?'rgba(46,125,50,0.1)':'rgba(46,125,50,0.05)'};transition:width 0.3s;"></div>
                 <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%;">
                   <div style="font-size:24px;">${d.icon}</div>
                   <div style="flex:1;min-width:0;">
@@ -57,7 +57,7 @@
                     <div style="font-size:11px;color:#888;">${d.count}x</div>
                   </div>
                   <div style="text-align:right;">
-                    <div style="font-size:16px;font-weight:700;color:${done?'#2e7d32':'#1976d2'}">${count}/${d.count}</div>
+                    <div style="font-size:16px;font-weight:700;color:${done?'#2e7d32':'#2E7D32'}">${count}/${d.count}</div>
                     ${done ? '<div style="font-size:10px;color:#2e7d32;">✓ Selesai</div>' : ''}
                   </div>
                 </div>
@@ -87,7 +87,7 @@
           <div class="dzikir-fs-title">#${idx} ${d.icon} ${d.count}x</div>
         </div>
         <div class="dzikir-fs-content">
-          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:24px;line-height:2;text-align:center;">${d.arabic}</div>
+          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:36px;line-height:2;text-align:center;">${d.arabic}</div>
           
           <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.1);border-radius:12px;">
             <div style="font-size:14px;margin-bottom:8px;">${d.latin}</div>
@@ -129,15 +129,15 @@
     function incrementDzikir(id, target) {
       const dzikir = loadDzikir();
       const current = dzikir[id] || 0;
-      
+
       if (current < target) {
         dzikir[id] = current + 1;
-        Storage.saveToday('dzikir', dzikir);
-        
+        saveDzikir(dzikir);
+
         const countEl = document.getElementById('dzikirCount');
         const circleEl = document.getElementById('dzikirCircle');
         if (countEl) countEl.textContent = current + 1;
-        
+
         if (current + 1 >= target) {
           if (circleEl) circleEl.classList.add('completed');
           showToast('✓ Alhamdulillah, selesai!', 'success');
@@ -148,8 +148,8 @@
     function resetSingleDzikir(id) {
       const dzikir = loadDzikir();
       dzikir[id] = 0;
-      Storage.saveToday('dzikir', dzikir);
-      
+      saveDzikir(dzikir);
+
       const countEl = document.getElementById('dzikirCount');
       const circleEl = document.getElementById('dzikirCircle');
       if (countEl) countEl.textContent = '0';
@@ -160,8 +160,8 @@
     function completeDzikir(id, target) {
       const dzikir = loadDzikir();
       dzikir[id] = target;
-      Storage.saveToday('dzikir', dzikir);
-      
+      saveDzikir(dzikir);
+
       const countEl = document.getElementById('dzikirCount');
       const circleEl = document.getElementById('dzikirCircle');
       if (countEl) countEl.textContent = target;
@@ -187,7 +187,7 @@
     
     function resetAllDzikir() {
       if (!confirm('Reset semua hitungan dzikir hari ini?')) return;
-      Storage.saveToday('dzikir', {});
+      saveDzikir({});
       render();
       showToast('Semua hitungan direset', 'info');
     }
