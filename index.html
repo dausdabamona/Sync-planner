@@ -73,23 +73,32 @@
           </div>
         </div>
         
-        <!-- Sholat -->
-        <div class="card compact-card">
-          <div class="card-header"><span class="card-title">🕌 Sholat Hari Ini</span><span class="card-action" onclick="navigateTo('ibadah')">Lihat →</span></div>
-          <div class="sholat-mini-list">
-            ${SHOLAT_LIST.map(s => `<div class="sholat-row-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholat('${s.id}')"><div class="check">${sholat[s.id]?.done?'✓':''}</div><span>${s.icon} ${s.name}</span></div>`).join('')}
+        <!-- Sholat & Dzikir Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <!-- Sholat Mini -->
+          <div class="card compact-card" style="margin-bottom:0;" onclick="navigateTo('ibadah')">
+            <div class="card-header"><span class="card-title">🕌 Sholat</span></div>
+            <div style="text-align:center;padding:8px 0;">
+              <div style="font-size:28px;font-weight:700;color:#2e7d32;">${Object.values(sholat).filter(s => s?.done).length}/8</div>
+              <div style="font-size:11px;color:#666;">Tap untuk ceklis</div>
+            </div>
+          </div>
+          
+          <!-- Dzikir Mini -->
+          <div class="card compact-card" style="margin-bottom:0;" onclick="goToDzikir()">
+            <div class="card-header"><span class="card-title">📿 Dzikir</span></div>
+            <div style="text-align:center;padding:8px 0;">
+              <div style="font-size:28px;font-weight:700;color:#1976d2;">${DZIKIR_LIST.filter(d => (loadDzikir()[d.id] || 0) >= d.count).length}/13</div>
+              <div style="font-size:11px;color:#666;">Tap untuk hitung</div>
+            </div>
           </div>
         </div>
         
-        <!-- Dzikir Pagi/Sore -->
+        <!-- Sholat Detail -->
         <div class="card compact-card">
-          <div class="card-header"><span class="card-title">📿 Dzikir Pagi/Sore</span><span class="card-action" onclick="goToDzikir()">Lihat →</span></div>
-          <div class="sunnah-mini-list">
-            ${DZIKIR_LIST.slice(0, 6).map(d => {
-              const dzikir = loadDzikir();
-              const done = (dzikir[d.id] || 0) >= d.count;
-              return `<div class="sunnah-mini-item ${done?'done':''}" onclick="goToDzikir()"><div class="check">${done?'✓':''}</div><span>${d.icon} ${d.count}x</span></div>`;
-            }).join('')}
+          <div class="card-header"><span class="card-title">🕌 Sholat Hari Ini</span><span class="card-action" onclick="navigateTo('ibadah')">Detail →</span></div>
+          <div class="sholat-mini-list">
+            ${SHOLAT_LIST.map(s => `<div class="sholat-row-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholat('${s.id}')"><div class="check">${sholat[s.id]?.done?'✓':''}</div><span>${s.icon} ${s.name}</span></div>`).join('')}
           </div>
         </div>
         

@@ -3,12 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Sholat - Sync Planner</title>
+  <title>Ibadah - Sync Planner</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/features.css">
+  <style>
+    .dzikir-fs{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a237e,#0d47a1);z-index:2000;display:flex;flex-direction:column;color:white;padding:16px;overflow-y:auto;}
+    .dzikir-fs-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.2);}
+    .dzikir-fs-back{background:none;border:none;color:white;font-size:14px;cursor:pointer;padding:8px 0;}
+    .dzikir-fs-nav{display:flex;gap:8px;}
+    .dzikir-fs-nav button{background:rgba(255,255,255,0.2);border:none;color:white;padding:8px 16px;border-radius:8px;cursor:pointer;}
+    .dzikir-fs-nav button:disabled{opacity:0.3;}
+    .dzikir-fs-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 0;}
+    .dzikir-fs-num{font-size:12px;opacity:0.7;margin-bottom:8px;}
+    .dzikir-fs-arabic{font-family:'Amiri',serif;font-size:24px;line-height:1.8;margin-bottom:16px;}
+    .dzikir-fs-latin{font-size:13px;opacity:0.9;margin-bottom:8px;}
+    .dzikir-fs-meaning{font-size:12px;opacity:0.7;margin-bottom:16px;}
+    .dzikir-fs-virtue{background:rgba(255,255,255,0.1);border-radius:12px;padding:12px;font-size:12px;margin-bottom:20px;}
+    .dzikir-fs-counter{margin:20px 0;}
+    .dzikir-fs-circle{width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;border:4px solid rgba(255,255,255,0.3);user-select:none;}
+    .dzikir-fs-circle:active{transform:scale(0.95);background:rgba(255,255,255,0.25);}
+    .dzikir-fs-circle.done{background:rgba(46,125,50,0.5);border-color:#4caf50;}
+    .dzikir-fs-count{font-size:48px;font-weight:700;}
+    .dzikir-fs-target{font-size:14px;opacity:0.7;}
+    .dzikir-fs-hint{font-size:11px;opacity:0.5;margin-top:8px;}
+    .dzikir-fs-actions{display:flex;gap:12px;margin-top:16px;}
+    .dzikir-fs-actions button{flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;}
+    .dzikir-fs-actions .reset{background:rgba(255,255,255,0.1);color:white;}
+    .dzikir-fs-actions .complete{background:rgba(255,255,255,0.2);color:white;}
+  </style>
 </head>
 <body>
   <header class="header" id="appHeader"></header>
@@ -18,56 +43,87 @@
   <script src="../js/data.js"></script>
   <script src="../js/app.js"></script>
   <script>
+    let activeTab = 'sholat';
+    let currentDzikirIndex = 0;
+    
     function render() {
       const main = document.getElementById('mainContent');
-      const sholat = loadSholat();
-      const sholatDone = Object.values(sholat).filter(s => s?.done).length;
-      
       main.innerHTML = `
-        <div class="card mb-3" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:none;">
-          <div style="text-align:center;">
-            <div style="font-size:32px;font-weight:700;color:#2e7d32;">${sholatDone}/8</div>
-            <div style="font-size:13px;color:#558b2f;">Sholat hari ini</div>
-            <div style="margin-top:8px;height:8px;background:rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;">
-              <div style="height:100%;width:${(sholatDone/8)*100}%;background:#2e7d32;border-radius:4px;transition:width 0.3s;"></div>
-            </div>
-          </div>
+        <div class="tabs mb-3">
+          <button class="tab-btn ${activeTab==='sholat'?'active':''}" onclick="setTab('sholat')">🕌 Sholat</button>
+          <button class="tab-btn ${activeTab==='dzikir'?'active':''}" onclick="setTab('dzikir')">📿 Dzikir</button>
         </div>
-        
-        <h3 style="font-size:14px;color:#666;margin-bottom:12px;">🕌 Sholat Fardhu</h3>
-        <div class="sholat-container mb-3">
-          ${SHOLAT_LIST.filter(s => s.fardhu).map(s => `
+        ${activeTab === 'sholat' ? renderSholat() : renderDzikir()}
+      `;
+    }
+    
+    function renderSholat() {
+      const sholat = loadSholat();
+      const done = Object.values(sholat).filter(s => s?.done).length;
+      return `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:none;text-align:center;">
+          <div style="font-size:32px;font-weight:700;color:#2e7d32;">${done}/8</div>
+          <div style="font-size:13px;color:#558b2f;">Sholat hari ini</div>
+        </div>
+        <div class="sholat-container">
+          ${SHOLAT_LIST.map(s => `
             <div class="sholat-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholatItem('${s.id}')">
               <div class="icon">${s.icon}</div>
               <div class="name">${s.name}</div>
-              <div class="time">${s.time}</div>
-              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:20px;margin-top:4px;">✓</div>' : ''}
+              <div class="time">${s.fardhu?'Fardhu':'Sunnah'}</div>
+              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:18px;margin-top:4px;">✓</div>' : ''}
             </div>
           `).join('')}
-        </div>
-        
-        <h3 style="font-size:14px;color:#666;margin-bottom:12px;">✨ Sholat Sunnah</h3>
-        <div class="sholat-container mb-3">
-          ${SHOLAT_LIST.filter(s => !s.fardhu).map(s => `
-            <div class="sholat-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholatItem('${s.id}')">
-              <div class="icon">${s.icon}</div>
-              <div class="name">${s.name}</div>
-              <div class="time">${s.time}</div>
-              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:20px;margin-top:4px;">✓</div>' : ''}
-            </div>
-          `).join('')}
-        </div>
-        
-        <div class="card" style="background:#e3f2fd;border:none;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <h4 style="font-size:14px;margin:0;">📿 Dzikir Pagi/Sore</h4>
-              <p style="font-size:12px;color:#666;margin:4px 0 0 0;">13 dzikir dengan keutamaan</p>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="navigateTo('dzikir')">Buka →</button>
-          </div>
         </div>
       `;
+    }
+    
+    function renderDzikir() {
+      const dzikir = loadDzikir();
+      const done = DZIKIR_LIST.filter(d => (dzikir[d.id] || 0) >= d.count).length;
+      const total = DZIKIR_LIST.reduce((s,d) => s + d.count, 0);
+      const current = DZIKIR_LIST.reduce((s,d) => s + Math.min(dzikir[d.id]||0, d.count), 0);
+      
+      return `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;text-align:center;">
+          <div style="font-size:32px;font-weight:700;color:#1976d2;">${done}/13</div>
+          <div style="font-size:13px;color:#1565c0;">Dzikir selesai (${current}/${total} bacaan)</div>
+        </div>
+        
+        <div style="background:#fffde7;border-radius:8px;padding:10px;margin-bottom:12px;text-align:center;">
+          <span style="font-size:12px;color:#f57f17;">💡 Tap dzikir untuk membuka counter. Getar saat selesai & otomatis lanjut!</span>
+        </div>
+        
+        ${DZIKIR_LIST.map((d, i) => {
+          const count = dzikir[d.id] || 0;
+          const isDone = count >= d.count;
+          const pct = Math.min(100, Math.round((count/d.count)*100));
+          return `
+            <div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer;position:relative;overflow:hidden;border-left:4px solid ${isDone?'#4caf50':'#1976d2'};" onclick="openDzikirCounter(${i})">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${isDone?'rgba(76,175,80,0.1)':'rgba(25,118,210,0.1)'};"></div>
+              <div style="position:relative;display:flex;align-items:center;gap:12px;">
+                <div style="font-size:24px;">${d.icon}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.latin.substring(0,35)}${d.latin.length>35?'...':''}</div>
+                  <div style="font-size:11px;color:#666;">${d.count}x • ${d.riwayat}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:16px;font-weight:700;color:${isDone?'#4caf50':'#1976d2'};">${count}/${d.count}</div>
+                  ${isDone?'<div style="color:#4caf50;font-size:12px;">✓</div>':''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        
+        <button class="btn btn-secondary btn-full mt-3" onclick="resetAllDzikir()">🔄 Reset Semua</button>
+      `;
+    }
+    
+    function setTab(tab) {
+      activeTab = tab;
+      renderHeader({ simple: true, title: tab === 'dzikir' ? '📿 Dzikir Pagi/Sore' : '🕌 Tracker Sholat' });
+      render();
     }
     
     function toggleSholatItem(id) {
@@ -75,11 +131,151 @@
       if (!sholat[id]) sholat[id] = {};
       sholat[id].done = !sholat[id].done;
       Storage.saveToday('sholat', sholat);
+      
+      // Getar singkat
+      if (navigator.vibrate) navigator.vibrate(50);
       render();
     }
     
+    // ===== DZIKIR COUNTER FULLSCREEN =====
+    function openDzikirCounter(index) {
+      currentDzikirIndex = index;
+      const d = DZIKIR_LIST[index];
+      const dzikir = loadDzikir();
+      const count = dzikir[d.id] || 0;
+      
+      const fs = document.createElement('div');
+      fs.className = 'dzikir-fs';
+      fs.id = 'dzikirFS';
+      fs.innerHTML = `
+        <div class="dzikir-fs-header">
+          <button class="dzikir-fs-back" onclick="closeDzikirCounter()">← Kembali</button>
+          <div class="dzikir-fs-nav">
+            <button onclick="prevDzikir()" ${index===0?'disabled':''}>◀</button>
+            <button onclick="nextDzikir()" ${index===DZIKIR_LIST.length-1?'disabled':''}>▶</button>
+          </div>
+        </div>
+        <div class="dzikir-fs-content">
+          <div class="dzikir-fs-num">${d.icon} Dzikir ${index+1} dari 13</div>
+          <div class="dzikir-fs-arabic">${d.arabic}</div>
+          <div class="dzikir-fs-latin">${d.latin}</div>
+          <div class="dzikir-fs-meaning">${d.meaning}</div>
+          <div class="dzikir-fs-virtue">✨ ${d.virtue}</div>
+          
+          <div class="dzikir-fs-counter">
+            <div class="dzikir-fs-circle ${count>=d.count?'done':''}" id="dzikirCircle" onclick="incrementDzikirCounter()">
+              <div class="dzikir-fs-count" id="dzikirCount">${count}</div>
+              <div class="dzikir-fs-target">/ ${d.count}</div>
+            </div>
+            <div class="dzikir-fs-hint">Tap untuk menghitung</div>
+          </div>
+          
+          <div class="dzikir-fs-actions">
+            <button class="reset" onclick="resetCurrentDzikir()">🔄 Reset</button>
+            <button class="complete" onclick="completeCurrentDzikir()">✓ Selesai</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(fs);
+    }
+    
+    function closeDzikirCounter() {
+      document.getElementById('dzikirFS')?.remove();
+      render();
+    }
+    
+    function incrementDzikirCounter() {
+      const d = DZIKIR_LIST[currentDzikirIndex];
+      const dzikir = loadDzikir();
+      const current = dzikir[d.id] || 0;
+      
+      if (current < d.count) {
+        dzikir[d.id] = current + 1;
+        Storage.saveToday('dzikir', dzikir);
+        
+        // Update UI
+        document.getElementById('dzikirCount').textContent = current + 1;
+        
+        // Getar singkat setiap tap
+        if (navigator.vibrate) navigator.vibrate(30);
+        
+        // Cek selesai
+        if (current + 1 >= d.count) {
+          document.getElementById('dzikirCircle').classList.add('done');
+          
+          // GETAR PANJANG saat selesai
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+          
+          showToast('✓ Alhamdulillah! Dzikir selesai', 'success');
+          
+          // AUTO NEXT setelah 1.5 detik
+          if (currentDzikirIndex < DZIKIR_LIST.length - 1) {
+            setTimeout(() => {
+              nextDzikir();
+            }, 1500);
+          } else {
+            // Semua selesai
+            setTimeout(() => {
+              showToast('🎉 Masya Allah! Semua dzikir selesai!', 'success');
+            }, 500);
+          }
+        }
+      }
+    }
+    
+    function prevDzikir() {
+      if (currentDzikirIndex > 0) {
+        closeDzikirCounter();
+        openDzikirCounter(currentDzikirIndex - 1);
+      }
+    }
+    
+    function nextDzikir() {
+      if (currentDzikirIndex < DZIKIR_LIST.length - 1) {
+        closeDzikirCounter();
+        openDzikirCounter(currentDzikirIndex + 1);
+      }
+    }
+    
+    function resetCurrentDzikir() {
+      const d = DZIKIR_LIST[currentDzikirIndex];
+      const dzikir = loadDzikir();
+      dzikir[d.id] = 0;
+      Storage.saveToday('dzikir', dzikir);
+      
+      document.getElementById('dzikirCount').textContent = '0';
+      document.getElementById('dzikirCircle').classList.remove('done');
+      showToast('Hitungan direset', 'info');
+    }
+    
+    function completeCurrentDzikir() {
+      const d = DZIKIR_LIST[currentDzikirIndex];
+      const dzikir = loadDzikir();
+      dzikir[d.id] = d.count;
+      Storage.saveToday('dzikir', dzikir);
+      
+      // GETAR PANJANG
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+      
+      showToast('✓ Dzikir diselesaikan', 'success');
+      
+      // AUTO NEXT
+      if (currentDzikirIndex < DZIKIR_LIST.length - 1) {
+        setTimeout(() => nextDzikir(), 1000);
+      } else {
+        closeDzikirCounter();
+      }
+    }
+    
+    function resetAllDzikir() {
+      if (!confirm('Reset semua hitungan dzikir?')) return;
+      Storage.saveToday('dzikir', {});
+      render();
+      showToast('Semua dzikir direset', 'info');
+    }
+    
+    // ===== INIT =====
     document.addEventListener('DOMContentLoaded', () => {
-      // Cek URL parameter untuk tab
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('tab') === 'dzikir') {
         activeTab = 'dzikir';

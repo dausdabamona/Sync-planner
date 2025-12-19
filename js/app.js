@@ -46,7 +46,7 @@ function renderHeader(options = {}) {
     <div class="header-stats">
       <div class="stats-left">
         <div class="stat-item clickable" onclick="navigateTo('ibadah')"><span>🕌</span><span class="value">${sholatDone}/8</span></div>
-        <div class="stat-item clickable" onclick="navigateTo('dzikir')"><span>📿</span><span class="value">${dzikirDone}/13</span></div>
+        <div class="stat-item clickable" onclick="window.location.href=(window.location.pathname.includes('/pages/')?'':'pages/')+'ibadah.html?tab=dzikir'"><span>📿</span><span class="value">${dzikirDone}/13</span></div>
       </div>
       <div class="quick-icons">
         <button class="quick-icon-btn" onclick="showQuickBrainDump()">💭</button>
