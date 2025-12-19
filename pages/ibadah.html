@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Ibadah - Sync Planner</title>
+  <title>Sholat - Sync Planner</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/components.css">
@@ -18,189 +18,74 @@
   <script src="../js/data.js"></script>
   <script src="../js/app.js"></script>
   <script>
-    let activeTab = 'sholat';
-    
     function render() {
       const main = document.getElementById('mainContent');
       const sholat = loadSholat();
-      const dzikir = loadDzikir();
-      
-      main.innerHTML = `
-        <div class="tabs mb-3">
-          <button class="tab-btn ${activeTab==='sholat'?'active':''}" onclick="setTab('sholat')">🕌 Sholat</button>
-          <button class="tab-btn ${activeTab==='dzikir'?'active':''}" onclick="setTab('dzikir')">📿 Dzikir</button>
-        </div>
-        
-        ${activeTab === 'sholat' ? renderSholatTab(sholat) : renderDzikirTab(dzikir)}
-      `;
-    }
-    
-    function renderSholatTab(sholat) {
       const sholatDone = Object.values(sholat).filter(s => s?.done).length;
       
-      return `
+      main.innerHTML = `
         <div class="card mb-3" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:none;">
           <div style="text-align:center;">
             <div style="font-size:32px;font-weight:700;color:#2e7d32;">${sholatDone}/8</div>
             <div style="font-size:13px;color:#558b2f;">Sholat hari ini</div>
+            <div style="margin-top:8px;height:8px;background:rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:${(sholatDone/8)*100}%;background:#2e7d32;border-radius:4px;transition:width 0.3s;"></div>
+            </div>
           </div>
         </div>
         
-        <div class="sholat-container">
-          ${SHOLAT_LIST.map(s => `
-            <div class="sholat-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholat('${s.id}'); render();">
+        <h3 style="font-size:14px;color:#666;margin-bottom:12px;">🕌 Sholat Fardhu</h3>
+        <div class="sholat-container mb-3">
+          ${SHOLAT_LIST.filter(s => s.fardhu).map(s => `
+            <div class="sholat-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholatItem('${s.id}')">
               <div class="icon">${s.icon}</div>
               <div class="name">${s.name}</div>
-              <div class="time">${s.fardhu?'Fardhu':'Sunnah'}</div>
-              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:18px;margin-top:4px;">✓</div>' : ''}
+              <div class="time">${s.time}</div>
+              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:20px;margin-top:4px;">✓</div>' : ''}
             </div>
           `).join('')}
         </div>
-      `;
-    }
-    
-    function renderDzikirTab(dzikir) {
-      const completed = DZIKIR_LIST.filter(d => (dzikir[d.id] || 0) >= d.count).length;
-      const totalCount = DZIKIR_LIST.reduce((sum, d) => sum + d.count, 0);
-      const doneCount = DZIKIR_LIST.reduce((sum, d) => sum + Math.min(dzikir[d.id] || 0, d.count), 0);
-      
-      return `
-        <div class="card mb-3" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;">
-          <div style="text-align:center;">
-            <div style="font-size:32px;font-weight:700;color:#1976d2;">${completed}/${DZIKIR_LIST.length}</div>
-            <div style="font-size:13px;color:#1565c0;">Dzikir Pagi/Sore (${doneCount}/${totalCount} bacaan)</div>
-          </div>
-        </div>
         
-        <div class="card mb-3" style="background:#fffde7;border:none;text-align:center;padding:12px;">
-          <p style="font-size:12px;color:#f57f17;margin:0;">💡 Dzikir sama untuk pagi & sore. Tap untuk menghitung!</p>
-        </div>
-        
-        <div class="dzikir-list">
-          ${DZIKIR_LIST.map(d => {
-            const count = dzikir[d.id] || 0;
-            const done = count >= d.count;
-            const percent = Math.min(100, Math.round((count / d.count) * 100));
-            return `
-              <div class="dzikir-item ${done?'completed':''}" onclick="openDzikir('${d.id}')" style="position:relative;overflow:hidden;">
-                <div style="position:absolute;left:0;top:0;bottom:0;width:${percent}%;background:${done?'rgba(46,125,50,0.1)':'rgba(25,118,210,0.1)'};transition:width 0.3s;"></div>
-                <div class="dzikir-item-icon" style="position:relative;z-index:1;">${d.icon}</div>
-                <div class="dzikir-item-content" style="position:relative;z-index:1;">
-                  <div class="dzikir-item-title">${d.latin.substring(0, 40)}${d.latin.length > 40 ? '...' : ''}</div>
-                  <div class="dzikir-item-count">${d.count}x • ${d.riwayat}</div>
-                </div>
-                <div class="dzikir-item-progress" style="position:relative;z-index:1;">
-                  <div class="dzikir-item-progress-text" style="color:${done?'#2e7d32':'#1976d2'}">${count}/${d.count}</div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-        
-        <button class="btn btn-secondary btn-full mt-3" onclick="resetDzikir()">🔄 Reset Semua Hitungan</button>
-      `;
-    }
-    
-    function setTab(tab) {
-      activeTab = tab;
-      render();
-    }
-    
-    function openDzikir(id) {
-      const d = DZIKIR_LIST.find(x => x.id === id);
-      if (!d) return;
-      
-      const dzikir = loadDzikir();
-      const count = dzikir[d.id] || 0;
-      
-      const fs = document.createElement('div');
-      fs.className = 'dzikir-fullscreen active';
-      fs.id = 'dzikirFullscreen';
-      fs.innerHTML = `
-        <div class="dzikir-fs-header">
-          <button class="dzikir-fs-back" onclick="closeDzikir()">← Kembali</button>
-          <div class="dzikir-fs-title">${d.icon} ${d.count}x</div>
-        </div>
-        <div class="dzikir-fs-content">
-          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:22px;line-height:2;">${d.arabic}</div>
-          <div class="dzikir-fs-latin" style="font-size:13px;margin-top:16px;">${d.latin}</div>
-          <div class="dzikir-fs-meaning" style="font-size:12px;opacity:0.8;margin-top:8px;">${d.meaning}</div>
-          
-          <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:12px;margin-top:20px;">
-            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;">Keutamaan</div>
-            <div style="font-size:13px;margin-top:4px;">${d.virtue}</div>
-          </div>
-          
-          <div class="dzikir-fs-counter">
-            <div class="dzikir-fs-circle ${count >= d.count ? 'completed' : ''}" onclick="incrementDzikir('${id}', ${d.count})" id="dzikirCircle">
-              <div class="dzikir-fs-count" id="dzikirCount">${count}</div>
-              <div class="dzikir-fs-target">/ ${d.count}</div>
+        <h3 style="font-size:14px;color:#666;margin-bottom:12px;">✨ Sholat Sunnah</h3>
+        <div class="sholat-container mb-3">
+          ${SHOLAT_LIST.filter(s => !s.fardhu).map(s => `
+            <div class="sholat-item ${sholat[s.id]?.done?'done':''}" onclick="toggleSholatItem('${s.id}')">
+              <div class="icon">${s.icon}</div>
+              <div class="name">${s.name}</div>
+              <div class="time">${s.time}</div>
+              ${sholat[s.id]?.done ? '<div style="color:#2e7d32;font-size:20px;margin-top:4px;">✓</div>' : ''}
             </div>
-          </div>
-          <p style="margin-top:12px;font-size:12px;opacity:0.7;">Tap lingkaran untuk menghitung</p>
-          
-          <div style="display:flex;gap:12px;margin-top:20px;">
-            <button onclick="resetSingleDzikir('${id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:white;cursor:pointer;">🔄 Reset</button>
-            <button onclick="completeDzikir('${id}', ${d.count})" style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.2);color:white;cursor:pointer;">✓ Selesai</button>
+          `).join('')}
+        </div>
+        
+        <div class="card" style="background:#e3f2fd;border:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <h4 style="font-size:14px;margin:0;">📿 Dzikir Pagi/Sore</h4>
+              <p style="font-size:12px;color:#666;margin:4px 0 0 0;">13 dzikir dengan keutamaan</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="navigateTo('dzikir')">Buka →</button>
           </div>
         </div>
       `;
-      document.body.appendChild(fs);
     }
     
-    function closeDzikir() {
-      document.getElementById('dzikirFullscreen')?.remove();
+    function toggleSholatItem(id) {
+      const sholat = loadSholat();
+      if (!sholat[id]) sholat[id] = {};
+      sholat[id].done = !sholat[id].done;
+      Storage.saveToday('sholat', sholat);
       render();
-    }
-    
-    function incrementDzikir(id, target) {
-      const dzikir = loadDzikir();
-      const current = dzikir[id] || 0;
-      
-      if (current < target) {
-        dzikir[id] = current + 1;
-        Storage.saveToday('dzikir', dzikir);
-        
-        const countEl = document.getElementById('dzikirCount');
-        const circleEl = document.getElementById('dzikirCircle');
-        if (countEl) countEl.textContent = current + 1;
-        
-        if (current + 1 >= target) {
-          if (circleEl) circleEl.classList.add('completed');
-          showToast('✓ Alhamdulillah, selesai!', 'success');
-        }
-      }
-    }
-    
-    function resetSingleDzikir(id) {
-      const dzikir = loadDzikir();
-      dzikir[id] = 0;
-      Storage.saveToday('dzikir', dzikir);
-      
-      const countEl = document.getElementById('dzikirCount');
-      const circleEl = document.getElementById('dzikirCircle');
-      if (countEl) countEl.textContent = '0';
-      if (circleEl) circleEl.classList.remove('completed');
-      showToast('Hitungan direset', 'info');
-    }
-    
-    function completeDzikir(id, target) {
-      const dzikir = loadDzikir();
-      dzikir[id] = target;
-      Storage.saveToday('dzikir', dzikir);
-      closeDzikir();
-      showToast('✓ Dzikir selesai!', 'success');
-    }
-    
-    function resetDzikir() {
-      if (!confirm('Reset semua hitungan dzikir hari ini?')) return;
-      Storage.saveToday('dzikir', {});
-      render();
-      showToast('Semua hitungan direset', 'info');
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      renderHeader({ simple: true, title: '🕌 Ibadah' });
+      // Cek URL parameter untuk tab
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'dzikir') {
+        activeTab = 'dzikir';
+      }
+      
+      renderHeader({ simple: true, title: activeTab === 'dzikir' ? '📿 Dzikir Pagi/Sore' : '🕌 Tracker Sholat' });
       renderBottomNav();
       render();
     });

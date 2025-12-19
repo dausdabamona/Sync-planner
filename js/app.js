@@ -4,7 +4,7 @@
 
 // ===== NAVIGATION =====
 function navigateTo(page) {
-  const pages = ['tasks','goals','pomodoro','ibadah','habits','journal','vision','review','wisdom','braindump','settings'];
+  const pages = ['tasks','goals','pomodoro','ibadah','dzikir','journal','vision','review','wisdom','braindump','settings'];
   if (pages.includes(page)) {
     window.location.href = 'pages/' + page + '.html';
   }
@@ -31,8 +31,8 @@ function renderHeader(options = {}) {
   const dateStr = formatDate(new Date());
   const sholat = loadSholat();
   const sholatDone = Object.values(sholat).filter(s => s?.done).length;
-  const habits = loadHabits();
-  const habitsDone = Object.values(habits).filter(Boolean).length;
+  const dzikir = loadDzikir();
+  const dzikirDone = DZIKIR_LIST.filter(d => (dzikir[d.id] || 0) >= d.count).length;
   
   header.innerHTML = `
     <div class="header-top">
@@ -46,7 +46,7 @@ function renderHeader(options = {}) {
     <div class="header-stats">
       <div class="stats-left">
         <div class="stat-item clickable" onclick="navigateTo('ibadah')"><span>🕌</span><span class="value">${sholatDone}/8</span></div>
-        <div class="stat-item clickable" onclick="navigateTo('habits')"><span>✨</span><span class="value">${habitsDone}/11</span></div>
+        <div class="stat-item clickable" onclick="navigateTo('dzikir')"><span>📿</span><span class="value">${dzikirDone}/13</span></div>
       </div>
       <div class="quick-icons">
         <button class="quick-icon-btn" onclick="showQuickBrainDump()">💭</button>
@@ -84,8 +84,8 @@ function showMenu() {
           </div>
           <div class="menu-section">
             <div class="menu-section-title">🕌 Ibadah</div>
-            <div class="menu-item" onclick="navigateTo('ibadah')"><span>🕌</span> Tracker Sholat & Dzikir</div>
-            <div class="menu-item" onclick="navigateTo('habits')"><span>✨</span> Sunnah Rasul</div>
+            <div class="menu-item" onclick="navigateTo('ibadah')"><span>🕌</span> Tracker Sholat</div>
+            <div class="menu-item" onclick="navigateTo('dzikir')"><span>📿</span> Dzikir Pagi/Sore (13)</div>
           </div>
           <div class="menu-section">
             <div class="menu-section-title">📝 Refleksi</div>

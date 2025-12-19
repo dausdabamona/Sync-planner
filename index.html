@@ -44,7 +44,7 @@
         <!-- Quick Actions -->
         <div class="quick-actions">
           <button class="action-btn primary" onclick="navigateTo('pomodoro')"><span class="icon">🎯</span><span class="label">Fokus</span></button>
-          <button class="action-btn" onclick="showAddTask()"><span class="icon">➕</span><span class="label">Task</span></button>
+          <button class="action-btn" onclick="goToDzikir()"><span class="icon">📿</span><span class="label">Dzikir</span></button>
           <button class="action-btn" onclick="navigateTo('journal')"><span class="icon">📝</span><span class="label">Jurnal</span></button>
           <button class="action-btn" onclick="navigateTo('wisdom')"><span class="icon">🏛️</span><span class="label">Wisdom</span></button>
         </div>
@@ -81,11 +81,15 @@
           </div>
         </div>
         
-        <!-- Sunnah -->
+        <!-- Dzikir Pagi/Sore -->
         <div class="card compact-card">
-          <div class="card-header"><span class="card-title">✨ Sunnah Rasul</span><span class="card-action" onclick="navigateTo('habits')">Lihat →</span></div>
+          <div class="card-header"><span class="card-title">📿 Dzikir Pagi/Sore</span><span class="card-action" onclick="goToDzikir()">Lihat →</span></div>
           <div class="sunnah-mini-list">
-            ${SUNNAH_HABITS.map(h => `<div class="sunnah-mini-item ${habits[h.id]?'done':''}" onclick="toggleHabit('${h.id}')"><div class="check">${habits[h.id]?'✓':''}</div><span>${h.icon} ${h.name}</span></div>`).join('')}
+            ${DZIKIR_LIST.slice(0, 6).map(d => {
+              const dzikir = loadDzikir();
+              const done = (dzikir[d.id] || 0) >= d.count;
+              return `<div class="sunnah-mini-item ${done?'done':''}" onclick="goToDzikir()"><div class="check">${done?'✓':''}</div><span>${d.icon} ${d.count}x</span></div>`;
+            }).join('')}
           </div>
         </div>
         
@@ -114,6 +118,10 @@
       const quote = getRandomQuote();
       document.querySelector('.quote-text').textContent = quote.text;
       document.querySelector('.quote-source').textContent = '— ' + quote.source;
+    }
+    
+    function goToDzikir() {
+      window.location.href = 'pages/ibadah.html?tab=dzikir';
     }
     
     // Init

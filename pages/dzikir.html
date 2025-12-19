@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dzikir Pagi/Sore - Sync Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <header class="header" id="appHeader"></header>
+  <main class="main" id="mainContent"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+  <script>
+    function render() {
+      const main = document.getElementById('mainContent');
+      const dzikir = loadDzikir();
+      const completed = DZIKIR_LIST.filter(d => (dzikir[d.id] || 0) >= d.count).length;
+      const totalCount = DZIKIR_LIST.reduce((sum, d) => sum + d.count, 0);
+      const doneCount = DZIKIR_LIST.reduce((sum, d) => sum + Math.min(dzikir[d.id] || 0, d.count), 0);
+      
+      main.innerHTML = `
+        <div class="card mb-3" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:none;">
+          <div style="text-align:center;">
+            <div style="font-size:32px;font-weight:700;color:#1976d2;">${completed}/${DZIKIR_LIST.length}</div>
+            <div style="font-size:13px;color:#1565c0;">Dzikir Selesai</div>
+            <div style="margin-top:8px;height:8px;background:rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:${(doneCount/totalCount)*100}%;background:#1976d2;border-radius:4px;transition:width 0.3s;"></div>
+            </div>
+            <div style="font-size:11px;color:#666;margin-top:4px;">${doneCount}/${totalCount} bacaan</div>
+          </div>
+        </div>
+        
+        <div class="card mb-3" style="background:#fffde7;border:none;text-align:center;padding:12px;">
+          <p style="font-size:12px;color:#f57f17;margin:0;">💡 Dzikir ini dibaca pagi (setelah Subuh) dan sore (setelah Ashar). Tap untuk menghitung!</p>
+        </div>
+        
+        <div class="dzikir-list">
+          ${DZIKIR_LIST.map((d, idx) => {
+            const count = dzikir[d.id] || 0;
+            const done = count >= d.count;
+            const percent = Math.min(100, Math.round((count / d.count) * 100));
+            return `
+              <div class="dzikir-item ${done?'completed':''}" onclick="openDzikir('${d.id}')" style="position:relative;overflow:hidden;">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:${percent}%;background:${done?'rgba(46,125,50,0.1)':'rgba(25,118,210,0.05)'};transition:width 0.3s;"></div>
+                <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%;">
+                  <div style="font-size:24px;">${d.icon}</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;color:#666;">#${idx+1} • ${d.riwayat}</div>
+                    <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.latin.substring(0, 35)}...</div>
+                    <div style="font-size:11px;color:#888;">${d.count}x</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-size:16px;font-weight:700;color:${done?'#2e7d32':'#1976d2'}">${count}/${d.count}</div>
+                    ${done ? '<div style="font-size:10px;color:#2e7d32;">✓ Selesai</div>' : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        
+        <button class="btn btn-secondary btn-full mt-3" onclick="resetAllDzikir()">🔄 Reset Semua Hitungan</button>
+      `;
+    }
+    
+    function openDzikir(id) {
+      const d = DZIKIR_LIST.find(x => x.id === id);
+      if (!d) return;
+      
+      const dzikir = loadDzikir();
+      const count = dzikir[d.id] || 0;
+      const idx = DZIKIR_LIST.findIndex(x => x.id === id) + 1;
+      
+      const fs = document.createElement('div');
+      fs.className = 'dzikir-fullscreen active';
+      fs.id = 'dzikirFullscreen';
+      fs.innerHTML = `
+        <div class="dzikir-fs-header">
+          <button class="dzikir-fs-back" onclick="closeDzikir()">← Kembali</button>
+          <div class="dzikir-fs-title">#${idx} ${d.icon} ${d.count}x</div>
+        </div>
+        <div class="dzikir-fs-content">
+          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:24px;line-height:2;text-align:center;">${d.arabic}</div>
+          
+          <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.1);border-radius:12px;">
+            <div style="font-size:14px;margin-bottom:8px;">${d.latin}</div>
+            <div style="font-size:12px;opacity:0.8;">${d.meaning}</div>
+          </div>
+          
+          <div style="margin-top:16px;padding:12px;background:rgba(255,215,0,0.2);border-radius:8px;border-left:3px solid #ffd700;">
+            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;">✨ Keutamaan</div>
+            <div style="font-size:13px;margin-top:4px;">${d.virtue}</div>
+          </div>
+          
+          <div class="dzikir-fs-counter">
+            <div class="dzikir-fs-circle ${count >= d.count ? 'completed' : ''}" onclick="incrementDzikir('${id}', ${d.count})" id="dzikirCircle">
+              <div class="dzikir-fs-count" id="dzikirCount">${count}</div>
+              <div class="dzikir-fs-target">/ ${d.count}</div>
+            </div>
+          </div>
+          <p style="margin-top:12px;font-size:12px;opacity:0.7;">Tap lingkaran untuk menghitung</p>
+          
+          <div style="display:flex;gap:12px;margin-top:20px;">
+            <button onclick="resetSingleDzikir('${id}')" style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:white;cursor:pointer;font-size:14px;">🔄 Reset</button>
+            <button onclick="completeDzikir('${id}', ${d.count})" style="flex:1;padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.2);color:white;cursor:pointer;font-size:14px;">✓ Selesai</button>
+          </div>
+          
+          <div style="display:flex;gap:12px;margin-top:12px;">
+            <button onclick="prevDzikir('${id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:white;cursor:pointer;font-size:12px;" ${idx <= 1 ? 'disabled style="opacity:0.3"' : ''}>← Sebelumnya</button>
+            <button onclick="nextDzikir('${id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:white;cursor:pointer;font-size:12px;" ${idx >= DZIKIR_LIST.length ? 'disabled style="opacity:0.3"' : ''}>Selanjutnya →</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(fs);
+    }
+    
+    function closeDzikir() {
+      document.getElementById('dzikirFullscreen')?.remove();
+      render();
+    }
+    
+    function incrementDzikir(id, target) {
+      const dzikir = loadDzikir();
+      const current = dzikir[id] || 0;
+      
+      if (current < target) {
+        dzikir[id] = current + 1;
+        Storage.saveToday('dzikir', dzikir);
+        
+        const countEl = document.getElementById('dzikirCount');
+        const circleEl = document.getElementById('dzikirCircle');
+        if (countEl) countEl.textContent = current + 1;
+        
+        if (current + 1 >= target) {
+          if (circleEl) circleEl.classList.add('completed');
+          showToast('✓ Alhamdulillah, selesai!', 'success');
+        }
+      }
+    }
+    
+    function resetSingleDzikir(id) {
+      const dzikir = loadDzikir();
+      dzikir[id] = 0;
+      Storage.saveToday('dzikir', dzikir);
+      
+      const countEl = document.getElementById('dzikirCount');
+      const circleEl = document.getElementById('dzikirCircle');
+      if (countEl) countEl.textContent = '0';
+      if (circleEl) circleEl.classList.remove('completed');
+      showToast('Hitungan direset', 'info');
+    }
+    
+    function completeDzikir(id, target) {
+      const dzikir = loadDzikir();
+      dzikir[id] = target;
+      Storage.saveToday('dzikir', dzikir);
+      
+      const countEl = document.getElementById('dzikirCount');
+      const circleEl = document.getElementById('dzikirCircle');
+      if (countEl) countEl.textContent = target;
+      if (circleEl) circleEl.classList.add('completed');
+      showToast('✓ Dzikir selesai!', 'success');
+    }
+    
+    function prevDzikir(currentId) {
+      const idx = DZIKIR_LIST.findIndex(x => x.id === currentId);
+      if (idx > 0) {
+        closeDzikir();
+        setTimeout(() => openDzikir(DZIKIR_LIST[idx - 1].id), 100);
+      }
+    }
+    
+    function nextDzikir(currentId) {
+      const idx = DZIKIR_LIST.findIndex(x => x.id === currentId);
+      if (idx < DZIKIR_LIST.length - 1) {
+        closeDzikir();
+        setTimeout(() => openDzikir(DZIKIR_LIST[idx + 1].id), 100);
+      }
+    }
+    
+    function resetAllDzikir() {
+      if (!confirm('Reset semua hitungan dzikir hari ini?')) return;
+      Storage.saveToday('dzikir', {});
+      render();
+      showToast('Semua hitungan direset', 'info');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ simple: true, title: '📿 Dzikir Pagi/Sore' });
+      renderBottomNav();
+      render();
+    });
+  </script>
+</body>
+</html>
