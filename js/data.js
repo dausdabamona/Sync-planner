@@ -298,7 +298,45 @@ function loadTasks() { return Storage.load('tasks', []); }
 function loadGoals() { return Storage.load('goals', []); }
 function loadSholat() { return Storage.getToday('sholat', {}); }
 function loadHabits() { return Storage.getToday('habits', {}); }
-function loadDzikir() { return Storage.getToday('dzikir', {}); }
+function loadDzikir() {
+  // Auto-reset dzikir berdasarkan waktu
+  const hour = getCurrentHour();
+  const isPagi = hour < 12; // 00:00-11:59 = pagi, 12:00-23:59 = sore
+
+  const allData = Storage.load('dzikir', {});
+  const today = Storage.today();
+
+  if (!allData[today]) {
+    allData[today] = { pagi: {}, sore: {} };
+  }
+
+  return isPagi ? allData[today].pagi : allData[today].sore;
+}
+function saveDzikir(data) {
+  // Simpan dzikir berdasarkan waktu (pagi/sore)
+  const hour = getCurrentHour();
+  const isPagi = hour < 12;
+
+  const allData = Storage.load('dzikir', {});
+  const today = Storage.today();
+
+  if (!allData[today]) {
+    allData[today] = { pagi: {}, sore: {} };
+  }
+
+  if (isPagi) {
+    allData[today].pagi = data;
+  } else {
+    allData[today].sore = data;
+  }
+
+  // Keep only last 30 days
+  const keys = Object.keys(allData).sort().reverse().slice(0, 30);
+  const trimmed = {};
+  keys.forEach(k => trimmed[k] = allData[k]);
+
+  Storage.save('dzikir', trimmed);
+}
 function loadJournal() { return Storage.getToday('journal', { morning: null, evening: null }); }
 function loadPomodoro() { return Storage.load('pomodoro', { today: 0, total: 0, streak: 0 }); }
 function loadBrainDump() { return Storage.load('braindump', []); }
