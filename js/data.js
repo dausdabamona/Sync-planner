@@ -34,58 +34,144 @@ const SHOLAT_LIST = [
   { id: 'witir', name: 'Witir', icon: '🌟', time: '03:30', fardhu: false }
 ];
 
-// ===== SUNNAH RASUL (11 habits) =====
-const SUNNAH_HABITS = [
-  { id: 'sahur', name: 'Sahur/Sarapan Pagi', arabic: 'تسحروا', time: 'pagi', icon: '🍽️' },
-  { id: 'siwak', name: 'Siwak/Gosok Gigi', arabic: 'السواك', time: 'pagi', icon: '🪥' },
-  { id: 'wudhu', name: 'Wudhu Sempurna', arabic: 'الوضوء', time: 'pagi', icon: '💧' },
-  { id: 'dzikir_pagi', name: 'Dzikir Pagi', arabic: 'أذكار الصباح', time: 'pagi', icon: '📿' },
-  { id: 'tilawah', name: 'Tilawah Quran', arabic: 'تلاوة القرآن', time: 'siang', icon: '📖' },
-  { id: 'sedekah', name: 'Sedekah', arabic: 'الصدقة', time: 'siang', icon: '🤲' },
-  { id: 'dzikir_sore', name: 'Dzikir Sore', arabic: 'أذكار المساء', time: 'sore', icon: '🌅' },
-  { id: 'qiyamul', name: 'Qiyamul Lail', arabic: 'قيام الليل', time: 'malam', icon: '🌙' },
-  { id: 'istighfar', name: 'Istighfar 100x', arabic: 'الاستغفار', time: 'malam', icon: '🤲' },
-  { id: 'sholawat', name: 'Sholawat Nabi', arabic: 'الصلاة على النبي', time: 'malam', icon: '💚' },
-  { id: 'tidur_cepat', name: 'Tidur Awal', arabic: 'النوم المبكر', time: 'malam', icon: '😴' }
+// ===== DZIKIR PAGI & SORE (13 dzikir dari materi) =====
+// Diurutkan dari yang paling sedikit/pendek ke paling banyak/panjang
+const DZIKIR_LIST = [
+  {
+    id: 'd01',
+    icon: '🌟',
+    arabic: 'سُبْحَانَ اللهِ وَ بِحَمْدِهِ سُبْحَانَ اللهِ اْلعَظِيْمِ',
+    latin: "Subhanallah wabihamdihi, subhanallahil 'adzhim",
+    meaning: 'Maha Suci Allah dan dengan pujian-Nya, Maha Suci Allah Yang Maha Agung',
+    count: 1,
+    virtue: 'Dua kalimat ringan di lisan, berat di timbangan, dicintai Ar-Rahman',
+    riwayat: 'HR. Bukhari'
+  },
+  {
+    id: 'd02',
+    icon: '💚',
+    arabic: 'رَضِيْتُ بِاللهِ رَبًّا وَ بِاْلإِسْلاَمِ دِيْنًا وَ بِمُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَ سَلَّمَ رَسُوْلاً',
+    latin: "Radhiitu billaahi rabba, wabil islaami diina, wabimuhammadin ﷺ rasuula",
+    meaning: 'Aku ridha Allah sebagai Tuhan, Islam sebagai agama, dan Muhammad ﷺ sebagai Rasul',
+    count: 1,
+    virtue: 'WAJIB MASUK SURGA bagi yang membacanya',
+    riwayat: 'HR. Abu Dawud'
+  },
+  {
+    id: 'd03',
+    icon: '🤲',
+    arabic: 'أَسْتَغْفِرُ اللهَ الَّذِى لاَ إِلٰهَ إِلاَّ هُوَ اْلحَيَّ اْلقَيُّوْمَ وَ اَتُوْبُ اِلَيْهِ',
+    latin: 'Astaghfirullahalladzi laa ilaaha illa huwalhayyalqayyuma wa atuubu ilaihi',
+    meaning: 'Aku minta ampun kepada Allah yang tiada Tuhan selain-Nya, Yang Maha Hidup lagi Maha Mengurus, dan aku bertaubat kepada-Nya',
+    count: 1,
+    virtue: 'Diampuni dosa meskipun telah LARI DARI PERANG',
+    riwayat: 'HR. Abu Dawud'
+  },
+  {
+    id: 'd04',
+    icon: '💪',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَ اللهُ أَكْبَرُ وَ لاَ حَوْلَ وَ لاَ قُوَّةَ إِلاَّ بِاللهِ',
+    latin: 'Laa ilaaha illallaahu wallaahu akbar walaa haula walaa quwwata illa billah',
+    meaning: 'Tiada Tuhan selain Allah, Allah Maha Besar, tiada daya dan upaya kecuali dengan izin Allah',
+    count: 1,
+    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd05',
+    icon: '🪑',
+    arabic: 'سُبْحَانَكَ اللّٰهُمَّ وَ بِحَمْدِكَ أَشْهَدُ أَنْ لاَ إِلٰهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَ أَتُوْبُ إِلَيْكَ',
+    latin: 'Subhanakallaahumma wabihamdika, asyhadu alla ilaaha illa anta, astaghfiruka wa atuubu ilaika',
+    meaning: 'Maha Suci Engkau ya Allah, aku bersaksi tiada Tuhan selain Engkau, aku minta ampun dan bertaubat kepada-Mu',
+    count: 1,
+    virtue: 'Diampuni dosa selama duduk (dibaca saat berdiri dari duduk)',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd06',
+    icon: '🆘',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ اْلعَلِيُّ اْلحَلِيْمُ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ اْلعَرْشِ اْلعَظِيْمِ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ السَّمٰوَاتِ وَ اْلاَرْضِ وَ رَبُّ اْلعَرْشِ اْلكَرِيْمِ',
+    latin: "Laa ilaaha illallahul 'aliyyul haliim, laa ilaaha illallahu rabbil 'arsyil 'adziim, laa ilaaha illallahu rabbissamawaati wal ardhi wa rabbil 'arsyil kariim",
+    meaning: 'Tiada Tuhan selain Allah Yang Maha Luhur lagi Maha Penyantun, Tuhan Arsy yang agung, Tuhan langit dan bumi',
+    count: 1,
+    virtue: 'DOA SAAT KESUSAHAN',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd07',
+    icon: '👁️',
+    arabic: 'اَلْحَمْدُ ِللهِ الَّذِى عَافَانِى مِمَّا ابْتَلاَكَ بِهِ وَ فَضَّلَنِى عَلَى كَثِيْرٍ مِمَّن خَلَقَ تَفْضِيْلاً',
+    latin: "Alhamdulillaahilladzii 'aafaanii mimmabtalaaka bihi, wa fadhdhalanii 'ala katsiirin mimman khalaqa tafdhiilan",
+    meaning: 'Segala puji bagi Allah yang menyelamatkan saya dari cobaan itu dan memberi kelebihan kepadaku',
+    count: 1,
+    virtue: 'Cobaan tidak akan menimpa yang membacanya (saat melihat orang tertimpa cobaan)',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd08',
+    icon: '👑',
+    arabic: 'اَللّٰهُمَّ أَنْتَ رَبِّى لاَ إِلٰهَ إِلاَّ أَنْتَ خَلَقْتَنِى وَ أَنَا عَبْدُكَ وَ أَنَا عَلَى عَهْدِكَ وَ وَعْدِكَ مَا اسْتَطَعْتُ أَعُوْذُبِكَ مِنْ شَرِّمَا صَنَعْتُ وَ أَبُوْءُ إِلَيْكَ بِنِعْمَتِكَ عَلَيَّ وَ أَعْتَرِفُ بِذُنُوْبِى فَاغْفِرْلِى ذُنُوْبِى إِنَّهُ لاَ يَغْفِرُ الذُّنُوْبَ إِلاَّ أَنْتَ',
+    latin: "Allahumma anta rabbi laa ilaaha illa anta, khalaqtani wa ana 'abduka, wa ana 'ala 'ahdika wawa'dika mastatha'tu, a'udzubika min syarrima shana'tu, wa abuu-u ilaika bini'matika 'alayya, wa a'tarifu bidzunuubii, faghfirlii dzunuubii, innahu laayaghfirudzunuuba illa anta",
+    meaning: 'Ya Allah, Engkau Tuhanku, Engkau menciptakanku, aku hamba-Mu, aku berpegang pada janji-Mu, aku berlindung dari keburukan perbuatanku, aku mengakui dosa-dosaku, ampunilah aku',
+    count: 1,
+    virtue: '👑 SAYYIDUL ISTIGHFAR - Pagi meninggal sebelum sore = SURGA. Sore meninggal sebelum pagi = SURGA',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd09',
+    icon: '🛡️',
+    arabic: 'بِسْمِ اللهِ الَّذِى لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِى اْلأَرْضِ وَ لاَ فِى السَّمَاءِ وَ هُوَ السَّمِيْعُ اْلعَلِيْمُ',
+    latin: "Bismillaahilladzi laa yadhurru ma'asmihi syaiun fil ardhi wa laa fissamaai wahuwas samii'ul 'aliim",
+    meaning: 'Dengan nama Allah yang tidak membahayakan bersama nama-Nya sesuatu di bumi dan di langit',
+    count: 3,
+    virtue: 'DIJAGA dari segala bahaya (dibaca 3x pagi & 3x sore)',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd10',
+    icon: '🔄',
+    arabic: 'رَبِّ اغْفِرْلِى وَ تُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ',
+    latin: 'Rabbighfirlii watubb alayya, innaka antatawwaaburrahiim',
+    meaning: 'Ya Tuhan, ampunilah aku dan terimalah taubatku, Engkau Maha Penerima taubat lagi Maha Penyayang',
+    count: 100,
+    virtue: 'Amalan yang biasa dibaca Nabi ﷺ 100x setiap duduk',
+    riwayat: 'HR. Abu Dawud'
+  },
+  {
+    id: 'd11',
+    icon: '📿',
+    arabic: 'سُبْحَانَ اللهِ وَ بِحَمْدِهِ',
+    latin: 'Subhanallah wabihamdihi',
+    meaning: 'Maha Suci Allah dan dengan pujian-Nya',
+    count: 100,
+    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
+    riwayat: 'HR. Bukhari'
+  },
+  {
+    id: 'd12',
+    icon: '✨',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيْكَ لَهُ لَهُ اْلمُلْكُ وَ لَهُ اْلحَمْدُ وَ هُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ',
+    latin: "Laailaaha illallahu wahdahu laa syariikalahu lahulmulku walahulhamdu wahuwa 'ala kulli syai-in qodiir",
+    meaning: 'Tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya, milik-Nya kerajaan dan segala puji',
+    count: 100,
+    virtue: 'Pahala 10 budak, 100 kebaikan, hapus 100 kejelekan, dijaga dari setan',
+    riwayat: 'HR. Bukhari'
+  },
+  {
+    id: 'd13',
+    icon: '🌙',
+    arabic: 'سُبْحَانَ اللهِ ۞ اَلْحَمْدُ ِللهِ ۞ اَللهُ أَكْبَرُ ۞ لاَ إِلٰهَ إِلاَّ اللهُ',
+    latin: 'Subhanallah, Alhamdulillah, Allahu Akbar, Laa ilaaha illallah (masing-masing 100x)',
+    meaning: 'Maha Suci Allah, Segala puji bagi Allah, Allah Maha Besar, Tiada Tuhan selain Allah',
+    count: 400,
+    virtue: 'Tasbih=haji 100x, Tahmid=100 kuda sabilillah, Tahlil=100 budak, Takbir=tiada tandingan',
+    riwayat: 'HR. Tirmidzi'
+  }
 ];
 
-// ===== DZIKIR PAGI (15 dzikir) =====
-const DZIKIR_PAGI = [
-  { id: 'ayat_kursi', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...', latin: 'Allahu laa ilaaha illa huwal hayyul qayyuum...', meaning: 'Allah, tidak ada Tuhan selain Dia, Yang Maha Hidup...', count: 1, virtue: 'Dijaga dari gangguan setan hingga sore' },
-  { id: 'ikhlas', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ...', latin: 'Qul huwallaahu ahad...', meaning: 'Katakanlah: Dialah Allah, Yang Maha Esa...', count: 3, virtue: 'Seperti membaca 1/3 Al-Quran' },
-  { id: 'falaq', arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...', latin: "Qul a'uudzu birabbil falaq...", meaning: 'Aku berlindung kepada Tuhan yang menguasai subuh...', count: 3, virtue: 'Perlindungan dari kejahatan' },
-  { id: 'nas', arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ...', latin: "Qul a'uudzu birabbin naas...", meaning: 'Aku berlindung kepada Tuhan manusia...', count: 3, virtue: 'Perlindungan dari bisikan setan' },
-  { id: 'sayyidul', arabic: 'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ...', latin: 'Allahumma anta rabbii laa ilaaha illaa anta...', meaning: 'Ya Allah, Engkau Tuhanku, tidak ada Tuhan selain Engkau...', count: 1, virtue: 'Sayyidul Istighfar' },
-  { id: 'pagi1', arabic: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ...', latin: 'Ashbahnaa wa ashbahal mulku lillaah...', meaning: 'Kami memasuki waktu pagi dan kerajaan milik Allah...', count: 1, virtue: 'Doa pembuka pagi' },
-  { id: 'pagi2', arabic: 'اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا...', latin: 'Allahumma bika ashbahnaa wa bika amsainaa...', meaning: 'Ya Allah, dengan rahmat-Mu kami memasuki waktu pagi...', count: 1, virtue: 'Berserah kepada Allah' },
-  { id: 'pagi3', arabic: 'اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ...', latin: "Allahumma maa ashbaha bii min ni'matin...", meaning: 'Ya Allah, nikmat yang ada padaku di pagi ini...', count: 1, virtue: 'Syukur atas nikmat' },
-  { id: 'tauhid', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ...', latin: 'Laa ilaaha illallaahu wahdahu laa syariika lah...', meaning: 'Tidak ada Tuhan selain Allah...', count: 10, virtue: 'Pahala memerdekakan budak' },
-  { id: 'subhanallah', arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', latin: 'Subhaanallaahi wa bihamdihi', meaning: 'Maha Suci Allah dan dengan memuji-Nya', count: 100, virtue: 'Dihapus dosa walau seperti buih laut' },
-  { id: 'taawudz', arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ...', latin: "A'uudzu bikalimaatillaahit taammaati...", meaning: 'Aku berlindung dengan kalimat-kalimat Allah...', count: 3, virtue: 'Perlindungan dari kejahatan' },
-  { id: 'ridhaa', arabic: 'رَضِيتُ بِاللَّهِ رَبًّا...', latin: 'Radhiitu billaahi rabbaa...', meaning: 'Aku ridha Allah sebagai Tuhanku...', count: 3, virtue: 'Hak mendapat syafaat Nabi ﷺ' },
-  { id: 'doa_afiat', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ...', latin: "Allahumma innii as'alukal 'aafiyah...", meaning: 'Ya Allah, aku memohon keselamatan...', count: 1, virtue: 'Doa keselamatan komprehensif' },
-  { id: 'doa_ilmu', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا...', latin: "Allahumma innii as'aluka 'ilman naafi'an...", meaning: 'Ya Allah, aku memohon ilmu yang bermanfaat...', count: 1, virtue: 'Doa setelah sholat Subuh' },
-  { id: 'hasbiyallah', arabic: 'حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ...', latin: 'Hasbiyallaahu laa ilaaha illa huwa...', meaning: 'Cukuplah Allah bagiku...', count: 7, virtue: 'Allah akan mencukupi urusanmu' }
-];
-
-// ===== DZIKIR SORE (15 dzikir) =====
-const DZIKIR_SORE = [
-  { id: 'ayat_kursi_s', arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...', latin: 'Allahu laa ilaaha illa huwal hayyul qayyuum...', meaning: 'Allah, tidak ada Tuhan selain Dia...', count: 1, virtue: 'Dijaga hingga pagi' },
-  { id: 'ikhlas_s', arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ...', latin: 'Qul huwallaahu ahad...', meaning: 'Katakanlah: Dialah Allah, Yang Maha Esa...', count: 3, virtue: '1/3 Al-Quran' },
-  { id: 'falaq_s', arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ...', latin: "Qul a'uudzu birabbil falaq...", meaning: 'Aku berlindung kepada Tuhan subuh...', count: 3, virtue: 'Perlindungan' },
-  { id: 'nas_s', arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ...', latin: "Qul a'uudzu birabbin naas...", meaning: 'Aku berlindung kepada Tuhan manusia...', count: 3, virtue: 'Perlindungan' },
-  { id: 'sayyidul_s', arabic: 'اللَّهُمَّ أَنْتَ رَبِّي...', latin: 'Allahumma anta rabbii...', meaning: 'Ya Allah, Engkau Tuhanku...', count: 1, virtue: 'Sayyidul Istighfar' },
-  { id: 'sore1', arabic: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ...', latin: 'Amsainaa wa amsal mulku lillaah...', meaning: 'Kami memasuki waktu sore...', count: 1, virtue: 'Doa pembuka sore' },
-  { id: 'sore2', arabic: 'اللَّهُمَّ بِكَ أَمْسَيْنَا...', latin: 'Allahumma bika amsainaa...', meaning: 'Ya Allah, dengan rahmat-Mu kami memasuki sore...', count: 1, virtue: 'Berserah' },
-  { id: 'sore3', arabic: 'اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ...', latin: "Allahumma maa amsaa bii min ni'matin...", meaning: 'Ya Allah, nikmat yang ada padaku di sore ini...', count: 1, virtue: 'Syukur' },
-  { id: 'tauhid_s', arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ...', latin: 'Laa ilaaha illallaahu wahdahu...', meaning: 'Tidak ada Tuhan selain Allah...', count: 10, virtue: 'Pahala besar' },
-  { id: 'subhanallah_s', arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', latin: 'Subhaanallaahi wa bihamdihi', meaning: 'Maha Suci Allah...', count: 100, virtue: 'Penghapus dosa' },
-  { id: 'taawudz_s', arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ...', latin: "A'uudzu bikalimaatillaah...", meaning: 'Aku berlindung dengan kalimat Allah...', count: 3, virtue: 'Perlindungan' },
-  { id: 'ridhaa_s', arabic: 'رَضِيتُ بِاللَّهِ رَبًّا...', latin: 'Radhiitu billaahi rabbaa...', meaning: 'Aku ridha Allah sebagai Tuhanku...', count: 3, virtue: 'Syafaat' },
-  { id: 'doa_afiat_s', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ...', latin: "Allahumma innii as'alukal 'aafiyah...", meaning: 'Ya Allah, aku memohon keselamatan...', count: 1, virtue: 'Keselamatan' },
-  { id: 'doa_malam', arabic: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذِهِ اللَّيْلَةِ...', latin: "Allahumma innii as'aluka khaira haadzihil lailah...", meaning: 'Ya Allah, aku memohon kebaikan malam ini...', count: 1, virtue: 'Doa malam' },
-  { id: 'hasbiyallah_s', arabic: 'حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ...', latin: 'Hasbiyallaahu laa ilaaha illa huwa...', meaning: 'Cukuplah Allah bagiku...', count: 7, virtue: 'Kecukupan' }
-];
+// Alias untuk kompatibilitas
+const DZIKIR_PAGI = DZIKIR_LIST;
+const DZIKIR_SORE = DZIKIR_LIST;
 
 // ===== WISDOM QUOTES =====
 const WISDOM_QUOTES = [
@@ -212,7 +298,7 @@ function loadTasks() { return Storage.load('tasks', []); }
 function loadGoals() { return Storage.load('goals', []); }
 function loadSholat() { return Storage.getToday('sholat', {}); }
 function loadHabits() { return Storage.getToday('habits', {}); }
-function loadDzikir() { return Storage.getToday('dzikir', { pagi: {}, sore: {} }); }
+function loadDzikir() { return Storage.getToday('dzikir', {}); }
 function loadJournal() { return Storage.getToday('journal', { morning: null, evening: null }); }
 function loadPomodoro() { return Storage.load('pomodoro', { today: 0, total: 0, streak: 0 }); }
 function loadBrainDump() { return Storage.load('braindump', []); }
