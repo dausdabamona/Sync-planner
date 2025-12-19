@@ -100,7 +100,12 @@ function loadAllData() {
   state.tasks = savedTasks ? JSON.parse(savedTasks) : [];
   
   const savedHabits = localStorage.getItem('syncPlannerHabits');
-  state.habits = savedHabits ? JSON.parse(savedHabits) : getDefaultHabits();
+  if (savedHabits) {
+    state.habits = JSON.parse(savedHabits);
+  } else {
+    state.habits = getDefaultHabits();
+    saveData('syncPlannerHabits', state.habits); // Save default habits
+  }
   
   const savedJournals = localStorage.getItem('syncPlannerJournals');
   state.journals = savedJournals ? JSON.parse(savedJournals) : [];
@@ -794,6 +799,9 @@ function initApp() {
   // Update date display
   const dateEl = document.getElementById('currentDate');
   if (dateEl) dateEl.textContent = formatDate(new Date());
+  
+  // Initialize Dzikir display
+  updateDzikirDisplay();
   
   console.log('✅ Sync Planner initialized');
 }
