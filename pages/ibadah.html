@@ -280,10 +280,20 @@
       if (urlParams.get('tab') === 'dzikir') {
         activeTab = 'dzikir';
       }
-      
+
       renderHeader({ simple: true, title: activeTab === 'dzikir' ? '📿 Dzikir Pagi/Sore' : '🕌 Tracker Sholat' });
       renderBottomNav();
       render();
+
+      // Auto-open dzikir pertama yang belum selesai (jika tab dzikir)
+      if (activeTab === 'dzikir') {
+        const dzikir = loadDzikir();
+        const firstIncompleteIndex = DZIKIR_LIST.findIndex(d => (dzikir[d.id] || 0) < d.count);
+
+        if (firstIncompleteIndex !== -1) {
+          setTimeout(() => openDzikirCounter(firstIncompleteIndex), 300);
+        }
+      }
     });
   </script>
 </body>
