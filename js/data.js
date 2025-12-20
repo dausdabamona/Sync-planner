@@ -34,9 +34,10 @@ const SHOLAT_LIST = [
   { id: 'witir', name: 'Witir', icon: '🌟', time: '03:30', fardhu: false }
 ];
 
-// ===== DZIKIR PAGI & SORE (13 dzikir dari materi) =====
-// Diurutkan dari yang paling sedikit/pendek ke paling banyak/panjang
+// ===== DZIKIR PAGI & SORE (16 dzikir) =====
+// Diurutkan dari yang paling pendek ke paling panjang (dalam setiap grup count)
 const DZIKIR_LIST = [
+  // === Count 1x (8 dzikir) - dari pendek ke panjang ===
   {
     id: 'd01',
     icon: '🌟',
@@ -49,13 +50,13 @@ const DZIKIR_LIST = [
   },
   {
     id: 'd02',
-    icon: '💚',
-    arabic: 'رَضِيْتُ بِاللهِ رَبًّا وَ بِاْلإِسْلاَمِ دِيْنًا وَ بِمُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَ سَلَّمَ رَسُوْلاً',
-    latin: "Radhiitu billaahi rabba, wabil islaami diina, wabimuhammadin ﷺ rasuula",
-    meaning: 'Aku ridha Allah sebagai Tuhan, Islam sebagai agama, dan Muhammad ﷺ sebagai Rasul',
+    icon: '💪',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَ اللهُ أَكْبَرُ وَ لاَ حَوْلَ وَ لاَ قُوَّةَ إِلاَّ بِاللهِ',
+    latin: 'Laa ilaaha illallaahu wallaahu akbar walaa haula walaa quwwata illa billah',
+    meaning: 'Tiada Tuhan selain Allah, Allah Maha Besar, tiada daya dan upaya kecuali dengan izin Allah',
     count: 1,
-    virtue: 'WAJIB MASUK SURGA bagi yang membacanya',
-    riwayat: 'HR. Abu Dawud'
+    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
+    riwayat: 'HR. Tirmidzi'
   },
   {
     id: 'd03',
@@ -69,16 +70,6 @@ const DZIKIR_LIST = [
   },
   {
     id: 'd04',
-    icon: '💪',
-    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَ اللهُ أَكْبَرُ وَ لاَ حَوْلَ وَ لاَ قُوَّةَ إِلاَّ بِاللهِ',
-    latin: 'Laa ilaaha illallaahu wallaahu akbar walaa haula walaa quwwata illa billah',
-    meaning: 'Tiada Tuhan selain Allah, Allah Maha Besar, tiada daya dan upaya kecuali dengan izin Allah',
-    count: 1,
-    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
-    riwayat: 'HR. Tirmidzi'
-  },
-  {
-    id: 'd05',
     icon: '🪑',
     arabic: 'سُبْحَانَكَ اللّٰهُمَّ وَ بِحَمْدِكَ أَشْهَدُ أَنْ لاَ إِلٰهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَ أَتُوْبُ إِلَيْكَ',
     latin: 'Subhanakallaahumma wabihamdika, asyhadu alla ilaaha illa anta, astaghfiruka wa atuubu ilaika',
@@ -88,17 +79,17 @@ const DZIKIR_LIST = [
     riwayat: 'HR. Tirmidzi'
   },
   {
-    id: 'd06',
-    icon: '🆘',
-    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ اْلعَلِيُّ اْلحَلِيْمُ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ اْلعَرْشِ اْلعَظِيْمِ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ السَّمٰوَاتِ وَ اْلاَرْضِ وَ رَبُّ اْلعَرْشِ اْلكَرِيْمِ',
-    latin: "Laa ilaaha illallahul 'aliyyul haliim, laa ilaaha illallahu rabbil 'arsyil 'adziim, laa ilaaha illallahu rabbissamawaati wal ardhi wa rabbil 'arsyil kariim",
-    meaning: 'Tiada Tuhan selain Allah Yang Maha Luhur lagi Maha Penyantun, Tuhan Arsy yang agung, Tuhan langit dan bumi',
+    id: 'd05',
+    icon: '💚',
+    arabic: 'رَضِيْتُ بِاللهِ رَبًّا وَ بِاْلإِسْلاَمِ دِيْنًا وَ بِمُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَ سَلَّمَ رَسُوْلاً',
+    latin: "Radhiitu billaahi rabba, wabil islaami diina, wabimuhammadin ﷺ rasuula",
+    meaning: 'Aku ridha Allah sebagai Tuhan, Islam sebagai agama, dan Muhammad ﷺ sebagai Rasul',
     count: 1,
-    virtue: 'DOA SAAT KESUSAHAN',
-    riwayat: 'HR. Tirmidzi'
+    virtue: 'WAJIB MASUK SURGA bagi yang membacanya',
+    riwayat: 'HR. Abu Dawud'
   },
   {
-    id: 'd07',
+    id: 'd06',
     icon: '👁️',
     arabic: 'اَلْحَمْدُ ِللهِ الَّذِى عَافَانِى مِمَّا ابْتَلاَكَ بِهِ وَ فَضَّلَنِى عَلَى كَثِيْرٍ مِمَّن خَلَقَ تَفْضِيْلاً',
     latin: "Alhamdulillaahilladzii 'aafaanii mimmabtalaaka bihi, wa fadhdhalanii 'ala katsiirin mimman khalaqa tafdhiilan",
@@ -108,15 +99,26 @@ const DZIKIR_LIST = [
     riwayat: 'HR. Tirmidzi'
   },
   {
+    id: 'd07',
+    icon: '🆘',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ اْلعَلِيُّ اْلحَلِيْمُ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ اْلعَرْشِ اْلعَظِيْمِ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ السَّمٰوَاتِ وَ اْلاَرْضِ وَ رَبُّ اْلعَرْشِ اْلكَرِيْمِ',
+    latin: "Laa ilaaha illallahul 'aliyyul haliim, laa ilaaha illallahu rabbil 'arsyil 'adziim, laa ilaaha illallahu rabbissamawaati wal ardhi wa rabbil 'arsyil kariim",
+    meaning: 'Tiada Tuhan selain Allah Yang Maha Luhur lagi Maha Penyantun, Tuhan Arsy yang agung, Tuhan langit dan bumi',
+    count: 1,
+    virtue: 'DOA SAAT KESUSAHAN',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
     id: 'd08',
     icon: '👑',
     arabic: 'اَللّٰهُمَّ أَنْتَ رَبِّى لاَ إِلٰهَ إِلاَّ أَنْتَ خَلَقْتَنِى وَ أَنَا عَبْدُكَ وَ أَنَا عَلَى عَهْدِكَ وَ وَعْدِكَ مَا اسْتَطَعْتُ أَعُوْذُبِكَ مِنْ شَرِّمَا صَنَعْتُ وَ أَبُوْءُ إِلَيْكَ بِنِعْمَتِكَ عَلَيَّ وَ أَعْتَرِفُ بِذُنُوْبِى فَاغْفِرْلِى ذُنُوْبِى إِنَّهُ لاَ يَغْفِرُ الذُّنُوْبَ إِلاَّ أَنْتَ',
-    latin: "Allahumma anta rabbi laa ilaaha illa anta, khalaqtani wa ana 'abduka, wa ana 'ala 'ahdika wawa'dika mastatha'tu, a'udzubika min syarrima shana'tu, wa abuu-u ilaika bini'matika 'alayya, wa a'tarifu bidzunuubii, faghfirlii dzunuubii, innahu laayaghfirudzunuuba illa anta",
+    latin: "Allahumma anta rabbi laa ilaaha illa anta, khalaqtani wa ana 'abduka, wa ana 'ala 'ahdika wawa'dika mastatha'tu, a'udzubika min syarrima shana'tu, wa abuu-u ilaika bini'matika 'alayya, wa a'trifu bidzunuubii, faghfirlii dzunuubii, innahu laayaghfirudzunuuba illa anta",
     meaning: 'Ya Allah, Engkau Tuhanku, Engkau menciptakanku, aku hamba-Mu, aku berpegang pada janji-Mu, aku berlindung dari keburukan perbuatanku, aku mengakui dosa-dosaku, ampunilah aku',
     count: 1,
     virtue: '👑 SAYYIDUL ISTIGHFAR - Pagi meninggal sebelum sore = SURGA. Sore meninggal sebelum pagi = SURGA',
     riwayat: 'HR. Tirmidzi'
   },
+  // === Count 3x (1 dzikir) ===
   {
     id: 'd09',
     icon: '🛡️',
@@ -127,38 +129,9 @@ const DZIKIR_LIST = [
     virtue: 'DIJAGA dari segala bahaya (dibaca 3x pagi & 3x sore)',
     riwayat: 'HR. Tirmidzi'
   },
+  // === Count 100x (7 dzikir) - dari pendek ke panjang ===
   {
     id: 'd10',
-    icon: '🔄',
-    arabic: 'رَبِّ اغْفِرْلِى وَ تُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ',
-    latin: 'Rabbighfirlii watubb alayya, innaka antatawwaaburrahiim',
-    meaning: 'Ya Tuhan, ampunilah aku dan terimalah taubatku, Engkau Maha Penerima taubat lagi Maha Penyayang',
-    count: 100,
-    virtue: 'Amalan yang biasa dibaca Nabi ﷺ 100x setiap duduk',
-    riwayat: 'HR. Abu Dawud'
-  },
-  {
-    id: 'd11',
-    icon: '📿',
-    arabic: 'سُبْحَانَ اللهِ وَ بِحَمْدِهِ',
-    latin: 'Subhanallah wabihamdihi',
-    meaning: 'Maha Suci Allah dan dengan pujian-Nya',
-    count: 100,
-    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
-    riwayat: 'HR. Bukhari'
-  },
-  {
-    id: 'd12',
-    icon: '✨',
-    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيْكَ لَهُ لَهُ اْلمُلْكُ وَ لَهُ اْلحَمْدُ وَ هُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ',
-    latin: "Laailaaha illallahu wahdahu laa syariikalahu lahulmulku walahulhamdu wahuwa 'ala kulli syai-in qodiir",
-    meaning: 'Tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya, milik-Nya kerajaan dan segala puji',
-    count: 100,
-    virtue: 'Pahala 10 budak, 100 kebaikan, hapus 100 kejelekan, dijaga dari setan',
-    riwayat: 'HR. Bukhari'
-  },
-  {
-    id: 'd13',
     icon: '🕌',
     arabic: 'سُبْحَانَ اللهِ',
     latin: 'Subhanallah',
@@ -168,17 +141,7 @@ const DZIKIR_LIST = [
     riwayat: 'HR. Tirmidzi'
   },
   {
-    id: 'd14',
-    icon: '🤲',
-    arabic: 'اَلْحَمْدُ ِللهِ',
-    latin: 'Alhamdulillah',
-    meaning: 'Segala puji bagi Allah',
-    count: 100,
-    virtue: 'Pahalanya seperti 100 kuda yang dikeluarkan di jalan Allah',
-    riwayat: 'HR. Tirmidzi'
-  },
-  {
-    id: 'd15',
+    id: 'd11',
     icon: '⭐',
     arabic: 'اَللهُ أَكْبَرُ',
     latin: 'Allahu Akbar',
@@ -188,7 +151,17 @@ const DZIKIR_LIST = [
     riwayat: 'HR. Tirmidzi'
   },
   {
-    id: 'd16',
+    id: 'd12',
+    icon: '🤲',
+    arabic: 'اَلْحَمْدُ ِللهِ',
+    latin: 'Alhamdulillah',
+    meaning: 'Segala puji bagi Allah',
+    count: 100,
+    virtue: 'Pahalanya seperti 100 kuda yang dikeluarkan di jalan Allah',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd13',
     icon: '🌙',
     arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ',
     latin: 'Laa ilaaha illallah',
@@ -196,6 +169,36 @@ const DZIKIR_LIST = [
     count: 100,
     virtue: 'Pahalanya seperti memerdekakan 100 budak',
     riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd14',
+    icon: '📿',
+    arabic: 'سُبْحَانَ اللهِ وَ بِحَمْدِهِ',
+    latin: 'Subhanallah wabihamdihi',
+    meaning: 'Maha Suci Allah dan dengan pujian-Nya',
+    count: 100,
+    virtue: 'Diampuni dosanya meskipun sebanyak BUIH SAMUDERA',
+    riwayat: 'HR. Bukhari'
+  },
+  {
+    id: 'd15',
+    icon: '🔄',
+    arabic: 'رَبِّ اغْفِرْلِى وَ تُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ',
+    latin: 'Rabbighfirlii watubb alayya, innaka antatawwaaburrahiim',
+    meaning: 'Ya Tuhan, ampunilah aku dan terimalah taubatku, Engkau Maha Penerima taubat lagi Maha Penyayang',
+    count: 100,
+    virtue: 'Amalan yang biasa dibaca Nabi ﷺ 100x setiap duduk',
+    riwayat: 'HR. Abu Dawud'
+  },
+  {
+    id: 'd16',
+    icon: '✨',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيْكَ لَهُ لَهُ اْلمُلْكُ وَ لَهُ اْلحَمْدُ وَ هُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ',
+    latin: "Laailaaha illallahu wahdahu laa syariikalahu lahulmulku walahulhamdu wahuwa 'ala kulli syai-in qodiir",
+    meaning: 'Tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya, milik-Nya kerajaan dan segala puji',
+    count: 100,
+    virtue: 'Pahala 10 budak, 100 kebaikan, hapus 100 kejelekan, dijaga dari setan',
+    riwayat: 'HR. Bukhari'
   }
 ];
 
