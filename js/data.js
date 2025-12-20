@@ -159,12 +159,42 @@ const DZIKIR_LIST = [
   },
   {
     id: 'd13',
+    icon: '🕌',
+    arabic: 'سُبْحَانَ اللهِ',
+    latin: 'Subhanallah',
+    meaning: 'Maha Suci Allah',
+    count: 100,
+    virtue: 'Pahalanya seperti 100x haji',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd14',
+    icon: '🤲',
+    arabic: 'اَلْحَمْدُ ِللهِ',
+    latin: 'Alhamdulillah',
+    meaning: 'Segala puji bagi Allah',
+    count: 100,
+    virtue: 'Pahalanya seperti 100 kuda yang dikeluarkan di jalan Allah',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd15',
+    icon: '⭐',
+    arabic: 'اَللهُ أَكْبَرُ',
+    latin: 'Allahu Akbar',
+    meaning: 'Allah Maha Besar',
+    count: 100,
+    virtue: 'Pahalanya tidak ada yang menandingi',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd16',
     icon: '🌙',
-    arabic: 'سُبْحَانَ اللهِ ۞ اَلْحَمْدُ ِللهِ ۞ اَللهُ أَكْبَرُ ۞ لاَ إِلٰهَ إِلاَّ اللهُ',
-    latin: 'Subhanallah, Alhamdulillah, Allahu Akbar, Laa ilaaha illallah (masing-masing 100x)',
-    meaning: 'Maha Suci Allah, Segala puji bagi Allah, Allah Maha Besar, Tiada Tuhan selain Allah',
-    count: 400,
-    virtue: 'Tasbih=haji 100x, Tahmid=100 kuda sabilillah, Tahlil=100 budak, Takbir=tiada tandingan',
+    arabic: 'لاَ إِلٰهَ إِلاَّ اللهُ',
+    latin: 'Laa ilaaha illallah',
+    meaning: 'Tiada Tuhan selain Allah',
+    count: 100,
+    virtue: 'Pahalanya seperti memerdekakan 100 budak',
     riwayat: 'HR. Tirmidzi'
   }
 ];
