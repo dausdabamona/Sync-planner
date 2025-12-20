@@ -116,10 +116,16 @@ function closeMenu() {
 
 // ===== SYNC =====
 function syncData() {
-  AppState.sync.pending = 0;
-  const el = document.getElementById('syncCount');
-  if (el) el.textContent = '0';
-  showToast('✓ Tersinkronisasi', 'success');
+  // Gunakan SyncManager jika tersedia dan enabled
+  if (typeof SyncManager !== 'undefined' && Config.SYNC_ENABLED) {
+    SyncManager.manualSync();
+  } else {
+    // Fallback untuk offline mode atau sync disabled
+    AppState.sync.pending = 0;
+    const el = document.getElementById('syncCount');
+    if (el) el.textContent = '0';
+    showToast('✓ Data tersimpan lokal (sync disabled)', 'info');
+  }
 }
 
 // ===== TOAST =====
