@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/features.css">
   <style>
-    .dzikir-fs{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a237e,#0d47a1);z-index:2000;display:flex;flex-direction:column;color:white;padding:16px;overflow-y:auto;}
+    .dzikir-fs{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1B5E20,#2E7D32);z-index:2000;display:flex;flex-direction:column;color:white;padding:16px;overflow-y:auto;}
     .dzikir-fs-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.2);}
     .dzikir-fs-back{background:none;border:none;color:white;font-size:14px;cursor:pointer;padding:8px 0;}
     .dzikir-fs-nav{display:flex;gap:8px;}
@@ -99,7 +99,7 @@
           const isDone = count >= d.count;
           const pct = Math.min(100, Math.round((count/d.count)*100));
           return `
-            <div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer;position:relative;overflow:hidden;border-left:4px solid ${isDone?'#4caf50':'#1976d2'};" onclick="openDzikirCounter(${i})">
+            <div class="card" style="padding:12px;margin-bottom:8px;cursor:pointer;position:relative;overflow:hidden;border-left:4px solid ${isDone?'#4caf50':'#2E7D32'};" onclick="openDzikirCounter(${i})">
               <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${isDone?'rgba(76,175,80,0.1)':'rgba(25,118,210,0.1)'};"></div>
               <div style="position:relative;display:flex;align-items:center;gap:12px;">
                 <div style="font-size:24px;">${d.icon}</div>
@@ -108,7 +108,7 @@
                   <div style="font-size:11px;color:#666;">${d.count}x • ${d.riwayat}</div>
                 </div>
                 <div style="text-align:right;">
-                  <div style="font-size:16px;font-weight:700;color:${isDone?'#4caf50':'#1976d2'};">${count}/${d.count}</div>
+                  <div style="font-size:16px;font-weight:700;color:${isDone?'#4caf50':'#2E7D32'};">${count}/${d.count}</div>
                   ${isDone?'<div style="color:#4caf50;font-size:12px;">✓</div>':''}
                 </div>
               </div>
