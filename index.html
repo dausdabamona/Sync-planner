@@ -88,7 +88,7 @@
           <div class="card compact-card" style="margin-bottom:0;" onclick="goToDzikir()">
             <div class="card-header"><span class="card-title">📿 Dzikir</span></div>
             <div style="text-align:center;padding:8px 0;">
-              <div style="font-size:28px;font-weight:700;color:#2E7D32;">${DZIKIR_LIST.filter(d => (loadDzikir()[d.id] || 0) >= d.count).length}/13</div>
+              <div style="font-size:28px;font-weight:700;color:#2E7D32;">${DZIKIR_LIST.filter(d => (loadDzikir()[d.id] || 0) >= d.count).length}/${DZIKIR_LIST.length}</div>
               <div style="font-size:11px;color:#666;">Tap untuk hitung</div>
             </div>
           </div>
