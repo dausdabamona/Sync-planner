@@ -191,7 +191,7 @@
       
       if (current < d.count) {
         dzikir[d.id] = current + 1;
-        Storage.saveToday('dzikir', dzikir);
+        saveDzikir(dzikir);
         
         // Update UI
         document.getElementById('dzikirCount').textContent = current + 1;
@@ -241,7 +241,7 @@
       const d = DZIKIR_LIST[currentDzikirIndex];
       const dzikir = loadDzikir();
       dzikir[d.id] = 0;
-      Storage.saveToday('dzikir', dzikir);
+      saveDzikir(dzikir);
       
       document.getElementById('dzikirCount').textContent = '0';
       document.getElementById('dzikirCircle').classList.remove('done');
@@ -252,7 +252,7 @@
       const d = DZIKIR_LIST[currentDzikirIndex];
       const dzikir = loadDzikir();
       dzikir[d.id] = d.count;
-      Storage.saveToday('dzikir', dzikir);
+      saveDzikir(dzikir);
       
       // GETAR PANJANG
       if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
@@ -269,7 +269,7 @@
     
     function resetAllDzikir() {
       if (!confirm('Reset semua hitungan dzikir?')) return;
-      Storage.saveToday('dzikir', {});
+      saveDzikir({});
       render();
       showToast('Semua dzikir direset', 'info');
     }

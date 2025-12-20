@@ -306,8 +306,13 @@ function loadDzikir() {
   const allData = Storage.load('dzikir', {});
   const today = Storage.today();
 
+  // Migration: convert old format to new format
   if (!allData[today]) {
     allData[today] = { pagi: {}, sore: {} };
+  } else if (!allData[today].pagi && !allData[today].sore) {
+    // Old format detected (flat object), migrate to new format
+    const oldData = allData[today];
+    allData[today] = { pagi: {}, sore: oldData };
   }
 
   return isPagi ? allData[today].pagi : allData[today].sore;
@@ -322,6 +327,10 @@ function saveDzikir(data) {
 
   if (!allData[today]) {
     allData[today] = { pagi: {}, sore: {} };
+  } else if (!allData[today].pagi && !allData[today].sore) {
+    // Old format detected, migrate to new format
+    const oldData = allData[today];
+    allData[today] = { pagi: {}, sore: oldData };
   }
 
   if (isPagi) {
