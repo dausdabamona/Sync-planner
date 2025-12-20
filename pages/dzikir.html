@@ -87,32 +87,32 @@
           <div class="dzikir-fs-title">#${idx} ${d.icon} ${d.count}x</div>
         </div>
         <div class="dzikir-fs-content">
-          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:36px;line-height:2;text-align:center;">${d.arabic}</div>
-          
+          <div style="display:flex;gap:12px;margin-bottom:20px;justify-content:center;">
+            <button onclick="resetSingleDzikir('${id}')" style="width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:transparent;color:white;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;">🔄</button>
+            <button onclick="completeDzikir('${id}', ${d.count})" style="width:50px;height:50px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:white;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;">✓</button>
+          </div>
+
+          <div class="dzikir-fs-arabic" style="font-family:'Amiri',serif;font-size:48px;line-height:2;text-align:center;">${d.arabic}</div>
+
           <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.1);border-radius:12px;">
             <div style="font-size:14px;margin-bottom:8px;">${d.latin}</div>
             <div style="font-size:12px;opacity:0.8;">${d.meaning}</div>
           </div>
-          
-          <div style="margin-top:16px;padding:12px;background:rgba(255,215,0,0.2);border-radius:8px;border-left:3px solid #ffd700;">
-            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;">✨ Keutamaan</div>
-            <div style="font-size:13px;margin-top:4px;">${d.virtue}</div>
-          </div>
-          
+
           <div class="dzikir-fs-counter">
             <div class="dzikir-fs-circle ${count >= d.count ? 'completed' : ''}" onclick="incrementDzikir('${id}', ${d.count})" id="dzikirCircle">
-              <div class="dzikir-fs-count" id="dzikirCount">${count}</div>
+              <div class="dzikir-fs-count" id="dzikirCount" style="font-size:36px;">${count}</div>
               <div class="dzikir-fs-target">/ ${d.count}</div>
             </div>
           </div>
           <p style="margin-top:12px;font-size:12px;opacity:0.7;">Tap lingkaran untuk menghitung</p>
-          
-          <div style="display:flex;gap:12px;margin-top:20px;">
-            <button onclick="resetSingleDzikir('${id}')" style="flex:1;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:white;cursor:pointer;font-size:14px;">🔄 Reset</button>
-            <button onclick="completeDzikir('${id}', ${d.count})" style="flex:1;padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.2);color:white;cursor:pointer;font-size:14px;">✓ Selesai</button>
+
+          <div style="margin-top:16px;padding:12px;background:rgba(255,215,0,0.2);border-radius:8px;border-left:3px solid #ffd700;">
+            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;">✨ Keutamaan</div>
+            <div style="font-size:13px;margin-top:4px;">${d.virtue}</div>
           </div>
-          
-          <div style="display:flex;gap:12px;margin-top:12px;">
+
+          <div style="display:flex;gap:12px;margin-top:20px;">
             <button onclick="prevDzikir('${id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:white;cursor:pointer;font-size:12px;" ${idx <= 1 ? 'disabled style="opacity:0.3"' : ''}>← Sebelumnya</button>
             <button onclick="nextDzikir('${id}')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:white;cursor:pointer;font-size:12px;" ${idx >= DZIKIR_LIST.length ? 'disabled style="opacity:0.3"' : ''}>Selanjutnya →</button>
           </div>
