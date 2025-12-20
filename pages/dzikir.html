@@ -121,9 +121,19 @@
       document.body.appendChild(fs);
     }
     
-    function closeDzikir() {
+    function closeDzikir(autoNext = false) {
       document.getElementById('dzikirFullscreen')?.remove();
       render();
+
+      // Auto-open dzikir berikutnya yang belum selesai (jika autoNext = true)
+      if (autoNext) {
+        const dzikir = loadDzikir();
+        const nextIncomplete = DZIKIR_LIST.find(d => (dzikir[d.id] || 0) < d.count);
+
+        if (nextIncomplete) {
+          setTimeout(() => openDzikir(nextIncomplete.id), 300);
+        }
+      }
     }
     
     function incrementDzikir(id, target) {
@@ -196,6 +206,15 @@
       renderHeader({ simple: true, title: '📿 Dzikir Pagi/Sore' });
       renderBottomNav();
       render();
+
+      // Auto-open dzikir pertama yang belum selesai
+      const dzikir = loadDzikir();
+      const firstIncomplete = DZIKIR_LIST.find(d => (dzikir[d.id] || 0) < d.count);
+
+      if (firstIncomplete) {
+        // Langsung buka dzikir pertama yang belum selesai
+        setTimeout(() => openDzikir(firstIncomplete.id), 300);
+      }
     });
   </script>
 </body>
