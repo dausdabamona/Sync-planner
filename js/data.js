@@ -142,22 +142,22 @@ const DZIKIR_LIST = [
   },
   {
     id: 'd11',
-    icon: '⭐',
-    arabic: 'اَللهُ أَكْبَرُ',
-    latin: 'Allahu Akbar',
-    meaning: 'Allah Maha Besar',
-    count: 100,
-    virtue: 'Pahalanya tidak ada yang menandingi',
-    riwayat: 'HR. Tirmidzi'
-  },
-  {
-    id: 'd12',
     icon: '🤲',
-    arabic: 'اَلْحَمْدُ ِللهِ',
+    arabic: 'الْحَمْدُ لِلَّهِ',
     latin: 'Alhamdulillah',
     meaning: 'Segala puji bagi Allah',
     count: 100,
     virtue: 'Pahalanya seperti 100 kuda yang dikeluarkan di jalan Allah',
+    riwayat: 'HR. Tirmidzi'
+  },
+  {
+    id: 'd12',
+    icon: '⭐',
+    arabic: 'اللهُ أَكْبَرُ',
+    latin: 'Allahu Akbar',
+    meaning: 'Allah Maha Besar',
+    count: 100,
+    virtue: 'Pahalanya tidak ada yang menandingi',
     riwayat: 'HR. Tirmidzi'
   },
   {
