@@ -91,7 +91,7 @@ const DZIKIR_LIST = [
   {
     id: 'd06',
     icon: '👁️',
-    arabic: 'اَلْحَمْدُ ِللهِ الَّذِى عَافَانِى مِمَّا ابْتَلاَكَ بِهِ وَ فَضَّلَنِى عَلَى كَثِيْرٍ مِمَّن خَلَقَ تَفْضِيْلاً',
+    arabic: 'الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي مِمَّا ابْتَلَاكَ بِهِ وَفَضَّلَنِي عَلَى كَثِيرٍ مِمَّنْ خَلَقَ تَفْضِيلًا',
     latin: "Alhamdulillaahilladzii 'aafaanii mimmabtalaaka bihi, wa fadhdhalanii 'ala katsiirin mimman khalaqa tafdhiilan",
     meaning: 'Segala puji bagi Allah yang menyelamatkan saya dari cobaan itu dan memberi kelebihan kepadaku',
     count: 1,
