@@ -96,7 +96,7 @@ export default function SettingsScreen() {
           <Text style={{ fontSize: 40, marginBottom: 8 }}>📱</Text>
           <Text style={{ fontSize: 20, fontWeight: '700', color: Colors.primary }}>Sync Planner</Text>
           <Text style={{ fontSize: 13, color: Colors.textSecondary }}>Islamic Productivity Mobile</Text>
-          <Text style={{ fontSize: 11, color: Colors.textLight, marginTop: 4 }}>v1.0.0 - React Native + SQLite</Text>
+          <Text style={{ fontSize: 11, color: Colors.textLight, marginTop: 4 }}>v2.0.0 - Cascading Goal System</Text>
         </Card>
 
         {/* Data Management */}
@@ -145,17 +145,20 @@ export default function SettingsScreen() {
 
         <Card>
           {[
-            '✅ Tasks & Kanban Board',
-            '🎯 Goals 12 Minggu',
-            '🍅 Pomodoro Timer',
+            '🎯 Target Quarterly (OKR + Key Results)',
+            '📅 Milestone Bulanan',
+            '🏃 Sprint Mingguan',
+            '✅ Aksi Harian + Checklist',
+            '🍅 Pomodoro Timer (linked to actions)',
+            '📊 Review Multi-Level (Harian/Mingguan/Bulanan/Quarterly)',
             '🕌 Tracker Sholat (8 waktu)',
             '📿 Dzikir Pagi/Sore (16 dzikir)',
             '✨ Sunnah Rasul (11 habit)',
-            '📓 Jurnal Pagi/Malam',
-            '🔭 Piramida Visi',
-            '🏛️ Wisdom Stoik (30 situasi)',
+            '📓 Jurnal Pagi/Malam + Action Checklist',
+            '🔭 Piramida Visi (10/3/1 tahun)',
+            '🏛️ Wisdom (30 situasi)',
             '💭 Brain Dump & Don\'t List',
-            '📊 Weekly Review',
+            '📋 Standalone Tasks',
           ].map((feat, i) => (
             <Text key={i} style={styles.featureItem}>{feat}</Text>
           ))}
