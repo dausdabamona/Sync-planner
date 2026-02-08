@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Sync Planner",
+    "slug": "sync-planner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0D47A1",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.syncplanner.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D47A1"
+      },
+      "package": "com.syncplanner.mobile"
+    },
+    "plugins": ["expo-sqlite"]
+  }
+}
